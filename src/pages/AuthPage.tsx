@@ -3,11 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, Lock, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import.meta.env.VITE_BACKEND_URL;
 
+// Correct way to read Vite env vars
+const { VITE_BACKEND_URL, VITE_CARBONGPT_URL } = import.meta.env;
 
-
-const { VITE_BACKEND_URL } = import.meta.env;
 const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -15,30 +14,31 @@ const AuthPage: React.FC = () => {
 
   const { name, email, password } = formData;
   const BACKEND_URL = VITE_BACKEND_URL || 'http://localhost:5000';
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSignUp) {
-      // Sign Up Logic
       try {
         await axios.post(`${BACKEND_URL}/api/auth/signup`, { name, email, password });
         alert('Registration successful! Please sign in.');
-        setIsSignUp(false); // Switch to sign-in form
+        setIsSignUp(false);
       } catch (err) {
         alert('Error: User may already exist or server is down.');
       }
     } else {
-      // Sign In Logic
       try {
         const res = await axios.post(`${BACKEND_URL}/api/auth/signin`, { email, password });
-        localStorage.setItem('token', res.data.token); // Save the token
-        
-        // --- THIS IS THE CHANGED LINE ---
-        // Redirect to the external GPT application URL
-        window.location.href = 'http://15.206.166.70:8501/';
-        
+        localStorage.setItem('token', res.data.token);
+        // Redirect to external GPT app (read from env)
+        if (VITE_CARBONGPT_URL) {
+          window.location.href = VITE_CARBONGPT_URL;
+        } else {
+          // fallback: stay in app if URL not provided
+          navigate('/');
+        }
       } catch (err) {
         alert('Error: Invalid credentials.');
       }

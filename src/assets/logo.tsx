@@ -12,14 +12,11 @@ const Logo: React.FC<LogoProps> = ({ className = '' }) => {
       <motion.img
         src={floraCarbonLogo}
         alt="Flora Carbon Logo"
-        className="h-16 md:h-20 w-auto mr-2 rounded-lg"
-        // Use whileHover to handle the animation directly
+        className="w-auto mr-2 rounded-lg"
+        style={{ height: '6rem' }}   // 🔥 set fixed height = 6rem
         whileHover={{ rotateY: 360 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
       />
-      <span className="font-serif text-2xl md:text-3xl font-semibold tracking-tight text-white">
-        Flora <span className="text-primary-600">Carbon</span>
-      </span>
     </div>
   );
 };

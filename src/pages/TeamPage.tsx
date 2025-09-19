@@ -9,10 +9,10 @@ import anjumaraImage from '../assets/anju.jpeg';
 
 const teamMembers = [
   // 2. Add an imageUrl property to each team member
-  { name: "Manir Dhabak", role: "Founder & CEO", imageUrl: manirImage },
-  { name: "Harish Pandey", role: "Lead GIS Consultant", imageUrl: harishImage },
-  { name: "Saif Saleem", role: "AI & Tech, IIT Ropar", imageUrl: saifImage },
-  { name: "Anjumanara Dhabak", role: "Design and Digital Media Lead", imageUrl: anjumaraImage },
+  { name: "Manir Dhabak", role: "Founder & CEO", imageUrl: manirImage, location: "India" },
+  { name: "Harish Pandey", role: "Lead GIS Consultant", imageUrl: harishImage, location: "India" },
+  { name: "Saif Saleem", role: "AI & Tech, IIT Ropar", imageUrl: saifImage, location: "India" },
+  { name: "Anjumanara Dhabak", role: "Design and Digital Media Lead", imageUrl: anjumaraImage, location: "India" },
 ];
 
 const TeamPage: React.FC = () => {

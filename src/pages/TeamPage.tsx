@@ -10,7 +10,7 @@ import anjumaraImage from '../assets/anju.jpeg';
 const teamMembers = [
   // 2. Add an imageUrl property to each team member
   { name: "Manir Dhabak", role: "Founder & CEO", imageUrl: manirImage, location: "India" },
-  { name: "Harish Pandey", role: "Lead GIS Consultant", imageUrl: harishImage, location: "India" },
+  { name: "Harish Pandey", role: "Lead GIS Consultant", imageUrl: harishImage, location: "Germany" },
   { name: "Saif Saleem", role: "AI & Tech, IIT Ropar", imageUrl: saifImage, location: "India" },
   { name: "Anjumanara Dhabak", role: "Design and Digital Media Lead", imageUrl: anjumaraImage, location: "India" },
 ];
@@ -76,6 +76,14 @@ const TeamPage: React.FC = () => {
                   className="text-emerald-300"
                 >
                   {member.role}
+                </motion.p>
+                <motion.p
+                  style={{ y: -5, x: 5, z: 30, rotateX: -10 }}
+                  variants={{ hover: { y: 0, x: 0, z: 0, rotateX: 0 } }}
+                  transition={{ type: 'spring', delay: 0.1 }}
+                  className="text-3xl font-bold text-gray-100 text-sm"
+                >
+                  {member.location}
                 </motion.p>
               </motion.div>
             </motion.div>

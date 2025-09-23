@@ -27,8 +27,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const headerVariants = {
     top: {
-      backgroundColor: 'rgba(255,255,255,0.72)',
-      backdropFilter: 'blur(14px)',
+      backgroundColor: '#fdfdfd',
+      backdropFilter: 'blur(0px)',
     },
     scrolled: {
       backgroundColor: 'rgba(255,255,255,0.85)',
@@ -48,21 +48,30 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         initial="top"
         animate={isScrolled ? 'scrolled' : 'top'}
         variants={headerVariants}
-        transition={{ duration: 0.35, ease: 'easeInOut' }}
-        className="fixed w-full z-50 ring-1 ring-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
+        transition={{ duration: 0.45, ease: 'easeInOut' }}
+        className={`fixed w-full z-50 transition-all duration-500 
+          ${isScrolled ? "ring-1 ring-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.06)]" : ""}
+        `}
       >
-        {/* subtle gradient glow behind header */}
-        <div
+        {/* subtle gradient glow behind header (only when scrolled) */}
+        <motion.div
           aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isScrolled ? 1 : 0 }}
+          transition={{ duration: 0.5, ease: 'easeInOut' }}
           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_120%_at_50%_-30%,rgba(16,185,129,0.12),transparent)]"
         />
-        {/* animated sheen pass (very subtle) */}
-        <div
+
+        {/* animated sheen pass (only when scrolled) */}
+        <motion.div
           aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isScrolled ? 1 : 0 }}
+          transition={{ duration: 0.5, ease: 'easeInOut' }}
           className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden"
         >
           <div className="h-full w-1/3 translate-x-[-100%] animate-sheen bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-        </div>
+        </motion.div>
 
         <div className="container-padding mx-auto ">
           <div className="flex items-center gap-4  text-gray-900">

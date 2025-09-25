@@ -70,28 +70,32 @@ export default function HeroFloraCarbonAI() {
         />
       </div>
 
-      {/* 2. This container holds the UI elements and is positioned relative to the component's root.
-         A margin-top is added to push it down from the tree container.
-         You can adjust `mt-4` to `mt-8` or higher to increase the space. */}
-      <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[250px]">
-          {/* Metric Boxes */}
-          <div className="grid grid-cols-3 gap-3">
-            <MetricBox label="Age" value={latest.age} unit="yrs" />
-            <MetricBox label="DBH" value={latest.dbh} unit="cm" />
+      {/* 2. This container holds the UI elements */}
+      <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[155px] mr-[200px]">
+        <span className="text-s font-semibold text-black mb-1">
+              Swietenia macrophylla
+            </span>
+        {/* Metric Boxes */}
+        <div className="grid grid-cols-3 gap-3">
+          <MetricBox label="Age" value={latest.age} unit="yrs" />
+          <MetricBox label="DBH" value={latest.dbh} unit="cm" />
+          <div className="flex flex-col items-center">
+            {/* Added species name above CO₂ box */}
+            
             <MetricBox label="CO₂e" value={latest.co2e} unit="t" />
           </div>
-
-          {/* Controls */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setAutoplay((a) => !a)}
-              className="rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm px-3 py-1 text-xs text-white/90 hover:bg-white/20"
-            >
-              {autoplay ? "Pause" : "Play"}
-            </button>
-          </div>
         </div>
+
+        {/* Controls */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setAutoplay((a) => !a)}
+            className="rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm px-3 py-1 text-xs text-white/90 hover:bg-white/20"
+          >
+            {autoplay ? "Pause" : "Play"}
+          </button>
+        </div>
+      </div>
     </motion.div>
   );
 }
-

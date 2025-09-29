@@ -35,7 +35,7 @@ const TeamPage: React.FC = () => {
       </div>
 
       <div className="container-padding mx-auto max-w-4xl pb-32">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
           {teamMembers.map((member, index) => (
             <motion.div
               key={index}
@@ -50,13 +50,18 @@ const TeamPage: React.FC = () => {
               <motion.div style={{ transformStyle: 'preserve-3d' }}>
                 {/* 3. Display the image if it exists, otherwise show the placeholder */}
                 {member.imageUrl ? (
-                  <img
-                    src={member.imageUrl}
-                    alt={member.name}
-                    className="w-full h-64 object-cover rounded-lg mb-4"
-                  />
+                  <div className="w-full h-48 sm:h-56 lg:h-64 rounded-lg mb-4 overflow-hidden">
+                    <img
+                      src={member.imageUrl}
+                      alt={member.name}
+                      loading="lazy"
+                      className="w-full h-full object-contain rounded-lg transition-opacity duration-300"
+                      onLoad={(e) => (e.target as HTMLImageElement).style.opacity = '1'}
+                      style={{ opacity: 0 }}
+                    />
+                  </div>
                 ) : (
-                  <div className="bg-emerald-900/30 h-64 rounded-lg mb-4 flex items-center justify-center">
+                  <div className="bg-emerald-900/30 h-48 sm:h-56 lg:h-64 rounded-lg mb-4 flex items-center justify-center">
                     <span className="text-gray-400">Photo</span>
                   </div>
                 )}
@@ -65,7 +70,7 @@ const TeamPage: React.FC = () => {
                   style={{ y: -5, x: 5, z: 50, rotateX: -10 }}
                   variants={{ hover: { y: 0, x: 0, z: 0, rotateX: 0 } }}
                   transition={{ type: 'spring' }}
-                  className="text-2xl font-bold text-emerald-100"
+                  className="text-2xl font-bold text-emerald-100 text-center"
                 >
                   {member.name}
                 </motion.h3>
@@ -73,7 +78,7 @@ const TeamPage: React.FC = () => {
                   style={{ y: -5, x: 5, z: 40, rotateX: -10 }}
                   variants={{ hover: { y: 0, x: 0, z: 0, rotateX: 0 } }}
                   transition={{ type: 'spring', delay: 0.05 }}
-                  className="text-emerald-300"
+                  className="text-emerald-300 text-center"
                 >
                   {member.role}
                 </motion.p>
@@ -81,7 +86,7 @@ const TeamPage: React.FC = () => {
                   style={{ y: -5, x: 5, z: 30, rotateX: -10 }}
                   variants={{ hover: { y: 0, x: 0, z: 0, rotateX: 0 } }}
                   transition={{ type: 'spring', delay: 0.1 }}
-                  className="text-3xl font-bold text-gray-100 text-sm"
+                  className="text-sm font-bold text-gray-100 text-center"
                 >
                   {member.location}
                 </motion.p>

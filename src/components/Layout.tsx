@@ -25,6 +25,28 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => setIsMenuOpen(false), [location.pathname]);
 
+  // Handle keyboard navigation for mobile menu
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isMenuOpen && event.key === 'Escape') {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   const headerVariants = {
     top: {
       backgroundColor: '#fdfdfd',
@@ -127,11 +149,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden ml-auto z-50"
+              className="md:hidden ml-auto z-50 p-2 rounded-lg hover:bg-gray-100/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
             >
-              {isMenuOpen ? <X /> : <Menu />}
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -140,18 +164,32 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
             className="fixed inset-0 bg-gray-900/70 backdrop-blur-md z-40 pt-24 px-8 md:hidden"
+            onClick={() => setIsMenuOpen(false)} // Close on backdrop click
           >
-            <nav className="flex flex-col items-center space-y-8">
-              {navItems.map((item) => (
-                <Link key={item.name} to={item.path} className="text-2xl font-semibold text-white">
+            <nav 
+              id="mobile-menu"
+              className="flex flex-col items-center space-y-8"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking nav items
+            >
+              {navItems.map((item, index) => (
+                <Link 
+                  key={item.name} 
+                  to={item.path} 
+                  className="text-2xl font-semibold text-white hover:text-emerald-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-lg px-4 py-2"
+                  tabIndex={isMenuOpen ? 0 : -1}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   {item.name}
                 </Link>
               ))}
               <Link
                 to="/auth"
-                className="text-2xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-3 rounded-full mt-4 shadow-md"
+                className="text-2xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-3 rounded-full mt-4 shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                tabIndex={isMenuOpen ? 0 : -1}
               >
                 Sign In
               </Link>

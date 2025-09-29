@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Leaf, BrainCircuit, Bot, ChevronDown } from 'lucide-react';
@@ -12,53 +12,108 @@ import forestBackground from '../assets/forest.jpg';
 import HeroFloraCarbonAI from '../components/HeroFloraCarbonAI';
 
 const HomePage: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [shouldPlayVideo, setShouldPlayVideo] = useState(false);
+
+  useEffect(() => {
+    // Detect mobile device
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+      
+      // Simple logic: Play video on desktop, use image on mobile
+      if (mobile) {
+        setShouldPlayVideo(false);
+      } else {
+        setShouldPlayVideo(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div className="bg-black text-white">
       {/* --- Hero Section --- */}
       <div className="relative h-screen flex flex-col justify-center items-center text-center overflow-hidden">
-        {/* Background video (now spans the entire hero section) */}
-        <video
-          src={forestVideo}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          poster={forestBackground} // Fallback image if video fails
-        />
+        {/* Background video with mobile optimization */}
+        {shouldPlayVideo ? (
+          <video
+            src={forestVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            poster={forestBackground}
+            preload={isMobile ? "metadata" : "auto"}
+          />
+        ) : (
+          <div 
+            className="absolute inset-0 w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${forestBackground})` }}
+          />
+        )}
 
         {/* Dark overlay (now spans the entire hero section, directly over the video) */}
         <div className="absolute inset-0"></div>
 
         {/* Hero Content + Tree Viz side by side, both floating on top of the shared video background */}
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-60 items-center max-w-7xl mx-auto px-6">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-7xl mx-auto px-6">
           
           {/* Left: Text Content */}
-          {/* No specific background on this div, so the video shows through */}
-          <div className="p-4 text-left md:text-left mb-[180px] mr-[20px]">
+          <div className="text-center lg:text-left mb-8 lg:mb-0 px-4 lg:px-0">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-xl md:text-4xl font-bold mb-4 text-black"
+              className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6 text-white drop-shadow-lg"
             >
-              We plant trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.<span className="text-primary-200"></span>
+              We plant trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.
             </motion.h1>
           
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}
-              className="mt-10"
+              className="mt-8"
             >
-              <Link to="/services" className="btn-primary">Our Technology</Link>
+              <Link to="/services" className="btn-primary text-sm sm:text-base">Our Technology</Link>
             </motion.div>
           </div>
 
           {/* Right: Tree Growth Visualization */}
-          {/* This component's internal styles give it its dark, translucent background, 
-              which will appear correctly over the main video background */}
-          <div className="hidden md:block">
+          {/* Mobile simplified version */}
+          <div className="block lg:hidden">
+            <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-emerald-800 p-6 text-center">
+              <div className="text-emerald-200 mb-4">
+                <h3 className="text-lg font-semibold mb-2">Tree Growth Tracking</h3>
+                <p className="text-sm text-gray-300">Monitor carbon sequestration in real-time</p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-emerald-900/30 rounded-lg p-3">
+                  <div className="text-xs text-emerald-300">Age</div>
+                  <div className="text-sm font-bold text-white">10 yrs</div>
+                </div>
+                <div className="bg-emerald-900/30 rounded-lg p-3">
+                  <div className="text-xs text-emerald-300">DBH</div>
+                  <div className="text-sm font-bold text-white">19.3 cm</div>
+                </div>
+                <div className="bg-emerald-900/30 rounded-lg p-3">
+                  <div className="text-xs text-emerald-300">CO₂e</div>
+                  <div className="text-sm font-bold text-white">0.33 t</div>
+                </div>
+              </div>
+              <Link to="/services" className="text-xs text-emerald-300 hover:text-emerald-200">
+                View Interactive Demo →
+              </Link>
+            </div>
+          </div>
+          
+          {/* Desktop full version */}
+          <div className="hidden lg:block">
             <HeroFloraCarbonAI />
           </div>
         </div>

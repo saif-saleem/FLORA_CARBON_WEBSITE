@@ -69,7 +69,7 @@ const HomePage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6 text-white drop-shadow-lg"
+              className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6 text-black drop-shadow-lg"
             >
               We plant trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.
             </motion.h1>

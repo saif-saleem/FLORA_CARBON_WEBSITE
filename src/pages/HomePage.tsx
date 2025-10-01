@@ -6,6 +6,7 @@ import CarbonCalculator from '../components/CarbonCalculator'; // Assuming this 
 
 // Import video + fallback image
 import forestVideo from '../assets/forest.mp4';
+import forestVideoMobile from '../assets/forest1.mp4';
 import forestBackground from '../assets/forest.jpg';
 
 // Import the HeroFloraCarbonAI (tree viz) component
@@ -21,12 +22,13 @@ const HomePage: React.FC = () => {
       const mobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       setIsMobile(mobile);
       
-      // Simple logic: Play video on desktop, use image on mobile
-      if (mobile) {
-        setShouldPlayVideo(false);
-      } else {
-        setShouldPlayVideo(true);
-      }
+      // Show video on both mobile and desktop
+      setShouldPlayVideo(true);
+      
+      // Debug logging
+      console.log('Mobile detected:', mobile);
+      console.log('Should play video:', true);
+      console.log('Video URL:', forestVideo);
     };
 
     checkMobile();
@@ -41,19 +43,37 @@ const HomePage: React.FC = () => {
         {/* Background video with mobile optimization */}
         {shouldPlayVideo ? (
           <video
-            src={forestVideo}
+            src={isMobile ? forestVideoMobile : forestVideo}
             autoPlay
             loop
             muted
             playsInline
+            webkit-playsinline="true"
             className="absolute inset-0 w-full h-full object-cover"
             poster={forestBackground}
-            preload={isMobile ? "metadata" : "auto"}
+            preload="auto"
+            style={{ zIndex: 1 }}
+            onError={() => {
+              console.log('Video failed to load, falling back to image');
+              setShouldPlayVideo(false);
+            }}
+            onLoadStart={() => {
+              console.log('Video started loading');
+            }}
+            onCanPlay={() => {
+              console.log('Video can play');
+            }}
+            onPlay={() => {
+              console.log('Video is playing');
+            }}
           />
         ) : (
           <div 
             className="absolute inset-0 w-full h-full bg-cover bg-center"
-            style={{ backgroundImage: `url(${forestBackground})` }}
+            style={{ 
+              backgroundImage: `url(${forestBackground})`,
+              zIndex: 1
+            }}
           />
         )}
 
@@ -84,33 +104,6 @@ const HomePage: React.FC = () => {
             </motion.div>
           </div>
 
-          {/* Right: Tree Growth Visualization */}
-          {/* Mobile simplified version */}
-          <div className="block lg:hidden">
-            <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-emerald-800 p-6 text-center">
-              <div className="text-emerald-200 mb-4">
-                <h3 className="text-lg font-semibold mb-2">Tree Growth Tracking</h3>
-                <p className="text-sm text-gray-300">Monitor carbon sequestration in real-time</p>
-              </div>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-emerald-900/30 rounded-lg p-3">
-                  <div className="text-xs text-emerald-300">Age</div>
-                  <div className="text-sm font-bold text-white">10 yrs</div>
-                </div>
-                <div className="bg-emerald-900/30 rounded-lg p-3">
-                  <div className="text-xs text-emerald-300">DBH</div>
-                  <div className="text-sm font-bold text-white">19.3 cm</div>
-                </div>
-                <div className="bg-emerald-900/30 rounded-lg p-3">
-                  <div className="text-xs text-emerald-300">CO₂e</div>
-                  <div className="text-sm font-bold text-white">0.33 t</div>
-                </div>
-              </div>
-              <Link to="/services" className="text-xs text-emerald-300 hover:text-emerald-200">
-                View Interactive Demo →
-              </Link>
-            </div>
-          </div>
           
           {/* Desktop full version */}
           <div className="hidden lg:block">

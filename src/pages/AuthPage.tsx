@@ -13,7 +13,7 @@ const AuthPage: React.FC = () => {
   const navigate = useNavigate();
 
   const { name, email, password } = formData;
-  const BACKEND_URL = VITE_BACKEND_URL || '';
+  const BACKEND_URL = VITE_BACKEND_URL || 'http://localhost:5000';
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });

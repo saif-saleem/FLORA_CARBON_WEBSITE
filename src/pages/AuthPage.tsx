@@ -20,17 +20,34 @@ const AuthPage: React.FC = () => {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Debug: Log the request data
+    const requestData = isSignUp ? { name, email, password } : { email, password };
+    console.log('Sending request to:', `${BACKEND_URL}/api/auth/${isSignUp ? 'signup' : 'signin'}`);
+    console.log('Request data:', requestData);
+    
     if (isSignUp) {
       try {
-        await axios.post(`${BACKEND_URL}/api/auth/signup`, { name, email, password });
+        const response = await axios.post(`${BACKEND_URL}/api/auth/signup`, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log('Signup response:', response.data);
         alert('Registration successful! Please sign in.');
         setIsSignUp(false);
-      } catch (err) {
+      } catch (err: any) {
+        console.error('Signup error:', err.response?.data || err.message);
         alert('Error: User may already exist or server is down.');
       }
     } else {
       try {
-        const res = await axios.post(`${BACKEND_URL}/api/auth/signin`, { email, password });
+        const res = await axios.post(`${BACKEND_URL}/api/auth/signin`, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log('Signin response:', res.data);
         localStorage.setItem('token', res.data.token);
         // Redirect to external GPT app (read from env)
         if (VITE_CARBONGPT_URL) {
@@ -39,7 +56,8 @@ const AuthPage: React.FC = () => {
           // fallback: redirect to new server
           window.location.href = 'http://13.126.242.182:8501';
         }
-      } catch (err) {
+      } catch (err: any) {
+        console.error('Signin error:', err.response?.data || err.message);
         alert('Error: Invalid credentials.');
       }
     }

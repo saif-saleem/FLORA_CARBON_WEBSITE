@@ -73,7 +73,7 @@ export default function HeroFloraCarbonAI() {
       {/* 2. This container holds the UI elements */}
       <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[155px] mr-[200px]">
         <span className="text-s font-semibold text-black mb-1">
-              Swietenia macrophylla
+              One mahogany tree absorbs ~2.54 tonnes<br />of tCO₂e in 40 years.
             </span>
         {/* Metric Boxes */}
         <div className="grid grid-cols-3 gap-3">

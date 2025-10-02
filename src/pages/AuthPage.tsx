@@ -36,8 +36,8 @@ const AuthPage: React.FC = () => {
         if (VITE_CARBONGPT_URL) {
           window.location.href = VITE_CARBONGPT_URL;
         } else {
-          // fallback: stay in app if URL not provided
-          navigate('/');
+          // fallback: redirect to new server
+          window.location.href = 'http://13.126.242.182:8501';
         }
       } catch (err) {
         alert('Error: Invalid credentials.');

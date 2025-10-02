@@ -7,10 +7,12 @@ import CarbonCalculator from '../components/CarbonCalculator'; // Assuming this 
 // Import video + fallback image
 import forestVideo from '../assets/forest.mp4';
 import forestVideoMobile from '../assets/forest1.mp4';
+import forestVideoMobile2 from '../assets/forest2.mp4';
 import forestBackground from '../assets/forest.jpg';
 
 // Import the HeroFloraCarbonAI (tree viz) component
 import HeroFloraCarbonAI from '../components/HeroFloraCarbonAI';
+import VideoCard from '../components/VideoCard';
 
 const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -28,7 +30,7 @@ const HomePage: React.FC = () => {
       // Debug logging
       console.log('Mobile detected:', mobile);
       console.log('Should play video:', true);
-      console.log('Video URL:', forestVideo);
+      console.log('Video URL:', mobile ? forestVideoMobile : forestVideo);
     };
 
     checkMobile();
@@ -40,38 +42,37 @@ const HomePage: React.FC = () => {
     <div className="bg-black text-white">
       {/* --- Hero Section --- */}
       <div className="relative h-screen flex flex-col justify-center items-center text-center overflow-hidden">
-        {/* Background video with mobile optimization */}
-        {shouldPlayVideo ? (
-          <video
-            src={isMobile ? forestVideoMobile : forestVideo}
-            autoPlay
-            loop
-            muted
-            playsInline
+        {/* Background video for desktop only */}
+        {!isMobile && shouldPlayVideo ? (
+        <video
+          src={forestVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
             webkit-playsinline="true"
-            className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
             poster={forestBackground}
             preload="auto"
             style={{ zIndex: 1 }}
             onError={() => {
-              console.log('Video failed to load, falling back to image');
+              console.log('Desktop video failed to load, falling back to image');
               setShouldPlayVideo(false);
             }}
             onLoadStart={() => {
-              console.log('Video started loading');
+              console.log('Desktop video started loading');
             }}
             onCanPlay={() => {
-              console.log('Video can play');
+              console.log('Desktop video can play');
             }}
             onPlay={() => {
-              console.log('Video is playing');
+              console.log('Desktop video is playing');
             }}
           />
         ) : (
           <div 
-            className="absolute inset-0 w-full h-full bg-cover bg-center"
+            className="absolute inset-0 w-full h-full bg-white"
             style={{ 
-              backgroundImage: `url(${forestBackground})`,
               zIndex: 1
             }}
           />
@@ -80,36 +81,69 @@ const HomePage: React.FC = () => {
         {/* Dark overlay (now spans the entire hero section, directly over the video) */}
         <div className="absolute inset-0"></div>
 
-        {/* Hero Content + Tree Viz side by side, both floating on top of the shared video background */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-7xl mx-auto px-6">
+        {/* Mobile Layout: Text above, Video Card below */}
+        {isMobile ? (
+          <div className="relative z-10 flex flex-col h-full w-full px-6 pt-16">
+            {/* Upper Half: Text Content */}
+            <div className="flex-1 flex flex-col justify-center items-center text-center mb-8">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="text-2xl sm:text-3xl font-bold mb-6 text-black drop-shadow-lg"
+              >
+                We plant trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.
+              </motion.h1>
+            
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.8 }}
+                className="mt-8"
+              >
+                <Link to="/services" className="btn-primary text-sm sm:text-base">Our Technology</Link>
+              </motion.div>
+            </div>
+
+            {/* Lower Half: Video Card */}
+            <div className="flex-1 flex items-center justify-center pb-8">
+              <VideoCard 
+                videoSrc={forestVideoMobile2}
+                className="w-full max-w-lg mx-auto"
+              />
+            </div>
+          </div>
+        ) : (
+          /* Desktop Layout: Side by side */
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-7xl mx-auto px-6">
           
           {/* Left: Text Content */}
-          <div className="text-center lg:text-left mb-8 lg:mb-0 px-4 lg:px-0">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6 text-black drop-shadow-lg"
-            >
-              We plant trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.
-            </motion.h1>
+            <div className="text-center lg:text-left mb-8 lg:mb-0 px-4 lg:px-0">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6 text-black drop-shadow-lg"
+              >
+                We plant trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.
+              </motion.h1>
           
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}
-              className="mt-8"
+                className="mt-8"
             >
-              <Link to="/services" className="btn-primary text-sm sm:text-base">Our Technology</Link>
+                <Link to="/services" className="btn-primary text-sm sm:text-base">Our Technology</Link>
             </motion.div>
           </div>
 
-          
-          {/* Desktop full version */}
-          <div className="hidden lg:block">
+          {/* Right: Tree Growth Visualization */}
+            <div className="hidden lg:block">
             <HeroFloraCarbonAI />
           </div>
         </div>
+        )}
 
         {/* Bounce Arrow */}
         <motion.div

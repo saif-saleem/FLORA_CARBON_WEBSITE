@@ -8,7 +8,6 @@ import CarbonCalculator from '../components/CarbonCalculator'; // Assuming this 
 import forestVideo from '../assets/fright.mp4';
 import forestVideoMobile from '../assets/forest1.mp4';
 import forestVideoMobile2 from '../assets/fcenter.mp4';
-import forestBackground from '../assets/forest.jpg';
 
 // Import the HeroFloraCarbonAI (tree viz) component
 import HeroFloraCarbonAI from '../components/HeroFloraCarbonAI';
@@ -54,7 +53,6 @@ const HomePage: React.FC = () => {
           playsInline
             webkit-playsinline="true"
           className="absolute inset-0 w-full h-full object-cover"
-            poster={forestBackground}
             preload="auto"
             style={{ zIndex: 1 }}
             onError={() => {

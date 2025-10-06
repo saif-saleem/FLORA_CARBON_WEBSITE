@@ -35,50 +35,69 @@ interface HeroFloraCarbonAIProps {
 }
 
 export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps = {}) {
+  // Initialize to starting state and autoplay enabled
   const [data, setData] = useState<any[]>([]);
-  const [index, setIndex] = useState(1);
-  const [autoplay, setAutoplay] = useState(true);
-  // Video-synchronized animation
+  const [index, setIndex] = useState<number>(1);
+  const [autoplay, setAutoplay] = useState<boolean>(true);
+  const [videoDuration, setVideoDuration] = useState(10);
+  // Video-synchronized animation (attach listeners regardless of autoplay)
   useEffect(() => {
     const videoElement = videoRef?.current;
-    if (!videoElement || !autoplay) return;
+    if (!videoElement) return;
 
     const updateDataFromVideo = () => {
       if (!videoElement) return;
       
       const currentTime = videoElement.currentTime;
-      const duration = videoElement.duration || 10; // Default duration if not available
+      const duration = videoDuration;
       
       // Map video time to data index (0 to GROWTH_DATA.length-1)
+      // Improved sync: use more precise mapping
       const progress = Math.min(currentTime / duration, 1);
-      const targetIndex = Math.floor(progress * (GROWTH_DATA.length - 1)) + 1;
+      const targetIndex = Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1);
       
-      if (targetIndex !== index) {
+      if (targetIndex !== index && targetIndex <= GROWTH_DATA.length) {
         setIndex(targetIndex);
         setData(GROWTH_DATA.slice(0, targetIndex));
       }
     };
 
     const handleTimeUpdate = () => updateDataFromVideo();
+    const handleLoadedMetadata = () => {
+      setVideoDuration(videoElement.duration);
+      // Force initial update after metadata loads
+      setTimeout(updateDataFromVideo, 100);
+    };
     
-    videoElement.addEventListener('timeupdate', handleTimeUpdate);
+  videoElement.addEventListener('timeupdate', handleTimeUpdate);
+  videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+  // Also update on play to cover autoplay start
+  videoElement.addEventListener('play', handleTimeUpdate);
     
     // Initial update
-    updateDataFromVideo();
+    // Initial update if metadata already loaded
+    if (videoElement.readyState >= 1) {
+      updateDataFromVideo();
+    }
 
     return () => {
       if (videoElement) {
         videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+        videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        videoElement.removeEventListener('play', handleTimeUpdate);
       }
     };
-  }, [videoRef, autoplay, index]);
+  }, [videoRef, autoplay, index, videoDuration]);
 
   // Sync video playback with animation state
   useEffect(() => {
     const videoElement = videoRef?.current;
     if (videoElement) {
       if (autoplay) {
-        videoElement.play();
+        videoElement.play().then(() => {
+          // Dispatch initial timeupdate to sync metrics immediately
+          videoElement.dispatchEvent(new Event('timeupdate'));
+        }).catch(() => {});
       } else {
         videoElement.pause();
       }
@@ -105,9 +124,9 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
       </div>
 
       {/* 2. This container holds the UI elements */}
-      <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[155px] mr-[200px]">
+      <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[50px] mr-[200px]">
         <span className="text-s font-semibold text-black mb-1">
-              One mahogany tree absorbs ~2.54 tonnes<br />of tCO₂e in 40 years.
+              One mahogany tree absorbs<br />~2.54 tonnes of tCO₂e in 40 years.
             </span>
         {/* Metric Boxes */}
         <div className="grid grid-cols-3 gap-3">

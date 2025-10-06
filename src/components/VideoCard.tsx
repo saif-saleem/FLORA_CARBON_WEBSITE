@@ -28,6 +28,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
   const [index, setIndex] = useState(1);
   const [autoplay, setAutoplay] = useState(true);
   const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
+  const [videoDuration, setVideoDuration] = useState(10);
 
   // Video-synchronized animation
   useEffect(() => {
@@ -37,10 +38,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
       if (!videoRef) return;
       
       const currentTime = videoRef.currentTime;
-      const duration = videoRef.duration || 10; // Default duration if not available
+      const duration = videoDuration;
       
       // Map video time to data index (0 to GROWTH_DATA.length-1)
-      const progress = Math.min(currentTime / duration, 1);
+      // Increase speed by multiplying progress by 2 to make animation faster
+      const progress = Math.min((currentTime / duration) * 2, 1);
       const targetIndex = Math.floor(progress * (GROWTH_DATA.length - 1)) + 1;
       
       if (targetIndex !== index) {
@@ -50,8 +52,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
     };
 
     const handleTimeUpdate = () => updateDataFromVideo();
+    const handleLoadedMetadata = () => {
+      setVideoDuration(videoRef.duration);
+    };
     
     videoRef.addEventListener('timeupdate', handleTimeUpdate);
+    videoRef.addEventListener('loadedmetadata', handleLoadedMetadata);
     
     // Initial update
     updateDataFromVideo();
@@ -59,9 +65,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
     return () => {
       if (videoRef) {
         videoRef.removeEventListener('timeupdate', handleTimeUpdate);
+        videoRef.removeEventListener('loadedmetadata', handleLoadedMetadata);
       }
     };
-  }, [videoRef, autoplay, index]);
+  }, [videoRef, autoplay, index, videoDuration]);
 
   // Sync video playback with animation state
   useEffect(() => {

@@ -52,7 +52,7 @@ const HomePage: React.FC = () => {
           muted
           playsInline
             webkit-playsinline="true"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover transform translate-x-[10%]"
             preload="auto"
             style={{ zIndex: 1 }}
             onError={() => {
@@ -74,6 +74,16 @@ const HomePage: React.FC = () => {
             className="absolute inset-0 w-full h-full bg-white"
             style={{ 
               zIndex: 1
+            }}
+          />
+        )}
+        
+        {/* White background fill for the shifted video area */}
+        {!isMobile && shouldPlayVideo && (
+          <div 
+            className="absolute inset-0 w-full h-full bg-white"
+            style={{ 
+              zIndex: 0
             }}
           />
         )}

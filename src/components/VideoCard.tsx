@@ -29,23 +29,41 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
   const [autoplay, setAutoplay] = useState(true);
   const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
 
+  // Video-synchronized animation
   useEffect(() => {
-    if (!autoplay) return;
+    if (!videoRef || !autoplay) return;
 
-    const id = setInterval(() => {
-      if (index >= GROWTH_DATA.length) {
-        setData([GROWTH_DATA[0]]);
-        setIndex(1);
-      } else {
-        setData(GROWTH_DATA.slice(0, index + 1));
-        setIndex((i) => i + 1);
+    const updateDataFromVideo = () => {
+      if (!videoRef) return;
+      
+      const currentTime = videoRef.currentTime;
+      const duration = videoRef.duration || 10; // Default duration if not available
+      
+      // Map video time to data index (0 to GROWTH_DATA.length-1)
+      const progress = Math.min(currentTime / duration, 1);
+      const targetIndex = Math.floor(progress * (GROWTH_DATA.length - 1)) + 1;
+      
+      if (targetIndex !== index) {
+        setIndex(targetIndex);
+        setData(GROWTH_DATA.slice(0, targetIndex));
       }
-    }, 600);
+    };
 
-    return () => clearInterval(id);
-  }, [index, autoplay]);
+    const handleTimeUpdate = () => updateDataFromVideo();
+    
+    videoRef.addEventListener('timeupdate', handleTimeUpdate);
+    
+    // Initial update
+    updateDataFromVideo();
 
-  // Sync video playback with animation
+    return () => {
+      if (videoRef) {
+        videoRef.removeEventListener('timeupdate', handleTimeUpdate);
+      }
+    };
+  }, [videoRef, autoplay, index]);
+
+  // Sync video playback with animation state
   useEffect(() => {
     if (videoRef) {
       if (autoplay) {
@@ -101,10 +119,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
       
       {/* Tree Data Cards */}
       <div className="p-4">
-        {/* Dynamic Text */}
+        {/* Static Text */}
         <div className="text-center mb-4">
           <span className="text-sm font-semibold text-black">
-            One mahogany tree absorbs ~{latest.co2e.toFixed(2)} tonnes<br />of tCO₂e in {latest.age} years.
+            One mahogany tree absorbs ~2.54 tonnes<br />of tCO₂e in 40 years.
           </span>
         </div>
         

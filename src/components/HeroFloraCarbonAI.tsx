@@ -30,26 +30,60 @@ function MetricBox({ label, value, unit }: { label: string; value: number; unit:
   );
 }
 
-export default function HeroFloraCarbonAI() {
+interface HeroFloraCarbonAIProps {
+  videoRef?: React.RefObject<HTMLVideoElement>;
+}
+
+export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps = {}) {
   const [data, setData] = useState<any[]>([]);
   const [index, setIndex] = useState(1);
   const [autoplay, setAutoplay] = useState(true);
-
+  // Video-synchronized animation
   useEffect(() => {
-    if (!autoplay) return;
+    const videoElement = videoRef?.current;
+    if (!videoElement || !autoplay) return;
 
-    const id = setInterval(() => {
-      if (index >= GROWTH_DATA.length) {
-        setData([GROWTH_DATA[0]]);
-        setIndex(1);
-      } else {
-        setData(GROWTH_DATA.slice(0, index + 1));
-        setIndex((i) => i + 1);
+    const updateDataFromVideo = () => {
+      if (!videoElement) return;
+      
+      const currentTime = videoElement.currentTime;
+      const duration = videoElement.duration || 10; // Default duration if not available
+      
+      // Map video time to data index (0 to GROWTH_DATA.length-1)
+      const progress = Math.min(currentTime / duration, 1);
+      const targetIndex = Math.floor(progress * (GROWTH_DATA.length - 1)) + 1;
+      
+      if (targetIndex !== index) {
+        setIndex(targetIndex);
+        setData(GROWTH_DATA.slice(0, targetIndex));
       }
-    }, 600);
+    };
 
-    return () => clearInterval(id);
-  }, [index, autoplay]);
+    const handleTimeUpdate = () => updateDataFromVideo();
+    
+    videoElement.addEventListener('timeupdate', handleTimeUpdate);
+    
+    // Initial update
+    updateDataFromVideo();
+
+    return () => {
+      if (videoElement) {
+        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+      }
+    };
+  }, [videoRef, autoplay, index]);
+
+  // Sync video playback with animation state
+  useEffect(() => {
+    const videoElement = videoRef?.current;
+    if (videoElement) {
+      if (autoplay) {
+        videoElement.play();
+      } else {
+        videoElement.pause();
+      }
+    }
+  }, [autoplay, videoRef]);
 
   const latest = data.length > 0 ? data[data.length - 1] : GROWTH_DATA[0];
 
@@ -73,7 +107,7 @@ export default function HeroFloraCarbonAI() {
       {/* 2. This container holds the UI elements */}
       <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[155px] mr-[200px]">
         <span className="text-s font-semibold text-black mb-1">
-              One mahogany tree absorbs ~{latest.co2e.toFixed(2)} tonnes<br />of tCO₂e in {latest.age} years.
+              One mahogany tree absorbs ~2.54 tonnes<br />of tCO₂e in 40 years.
             </span>
         {/* Metric Boxes */}
         <div className="grid grid-cols-3 gap-3">

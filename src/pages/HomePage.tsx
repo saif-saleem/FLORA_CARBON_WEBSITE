@@ -5,9 +5,9 @@ import { Leaf, BrainCircuit, Bot, ChevronDown } from 'lucide-react';
 import CarbonCalculator from '../components/CarbonCalculator'; // Assuming this component is used elsewhere or will be.
 
 // Import video + fallback image
-import forestVideo from '../assets/forest.mp4';
+import forestVideo from '../assets/fright.mp4';
 import forestVideoMobile from '../assets/forest1.mp4';
-import forestVideoMobile2 from '../assets/forest2.mp4';
+import forestVideoMobile2 from '../assets/fcenter.mp4';
 import forestBackground from '../assets/forest.jpg';
 
 // Import the HeroFloraCarbonAI (tree viz) component
@@ -17,6 +17,7 @@ import VideoCard from '../components/VideoCard';
 const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [shouldPlayVideo, setShouldPlayVideo] = useState(false);
+  const desktopVideoRef = React.useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     // Detect mobile device
@@ -45,6 +46,7 @@ const HomePage: React.FC = () => {
         {/* Background video for desktop only */}
         {!isMobile && shouldPlayVideo ? (
         <video
+          ref={desktopVideoRef}
           src={forestVideo}
           autoPlay
           loop
@@ -140,7 +142,7 @@ const HomePage: React.FC = () => {
 
           {/* Right: Tree Growth Visualization */}
             <div className="hidden lg:block">
-            <HeroFloraCarbonAI />
+            <HeroFloraCarbonAI videoRef={desktopVideoRef} />
           </div>
         </div>
         )}

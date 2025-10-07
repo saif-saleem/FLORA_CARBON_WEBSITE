@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// VideoCard.tsx
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 // Dataset - same as HeroFloraCarbonAI
@@ -27,59 +28,66 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
   const [data, setData] = useState<any[]>([]);
   const [index, setIndex] = useState(1);
   const [autoplay, setAutoplay] = useState(true);
-  const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null); // <-- stable ref (was state before)
   const [videoDuration, setVideoDuration] = useState(10);
 
-  // Video-synchronized animation
+  // Keep videoDuration up-to-date
   useEffect(() => {
-    if (!videoRef || !autoplay) return;
-
-    const updateDataFromVideo = () => {
-      if (!videoRef) return;
-      
-      const currentTime = videoRef.currentTime;
-      const duration = videoDuration;
-      
-      // Map video time to data index (0 to GROWTH_DATA.length-1)
-      // Increase speed by multiplying progress by 2 to make animation faster
-      const progress = Math.min((currentTime / duration) * 2, 1);
-      const targetIndex = Math.floor(progress * (GROWTH_DATA.length - 1)) + 1;
-      
-      if (targetIndex !== index) {
-        setIndex(targetIndex);
-        setData(GROWTH_DATA.slice(0, targetIndex));
-      }
+    const v = videoRef.current;
+    if (!v) return;
+    const onLoaded = () => {
+      if (!isNaN(v.duration) && v.duration > 0) setVideoDuration(v.duration);
     };
+    v.addEventListener('loadedmetadata', onLoaded);
+    // also call once if metadata already ready
+    if (v.readyState >= 1 && !isNaN(v.duration) && v.duration > 0) setVideoDuration(v.duration);
+    return () => v.removeEventListener('loadedmetadata', onLoaded);
+  }, []);
 
-    const handleTimeUpdate = () => updateDataFromVideo();
-    const handleLoadedMetadata = () => {
-      setVideoDuration(videoRef.duration);
-    };
-    
-    videoRef.addEventListener('timeupdate', handleTimeUpdate);
-    videoRef.addEventListener('loadedmetadata', handleLoadedMetadata);
-    
-    // Initial update
-    updateDataFromVideo();
-
-    return () => {
-      if (videoRef) {
-        videoRef.removeEventListener('timeupdate', handleTimeUpdate);
-        videoRef.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      }
-    };
-  }, [videoRef, autoplay, index, videoDuration]);
-
-  // Sync video playback with animation state
+  // Core: rAF loop that polls currentTime and updates state reliably
   useEffect(() => {
-    if (videoRef) {
-      if (autoplay) {
-        videoRef.play();
-      } else {
-        videoRef.pause();
+    let rafId = 0;
+
+    const tick = () => {
+      const v = videoRef.current;
+      if (v && autoplay && !v.paused) {
+        const duration = (!isNaN(v.duration) && v.duration > 0) ? v.duration : videoDuration || 1;
+        const currentTime = Math.max(0, v.currentTime || 0);
+        // same mapping you used (faster animation by *2)
+        const progress = Math.min((currentTime / duration) * 2, 1);
+        const targetIndex = Math.min(
+          GROWTH_DATA.length,
+          Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1)
+        );
+
+        // functional update to avoid stale closures
+        setIndex((prev) => {
+          if (prev !== targetIndex) {
+            setData(GROWTH_DATA.slice(0, targetIndex));
+            return targetIndex;
+          }
+          return prev;
+        });
       }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [autoplay, videoDuration]); // runs while autoplay changes
+
+  // Sync video element play/pause with autoplay state
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (autoplay) {
+      v.play().catch(() => {
+        /* ignore autoplay block errors — loop will still poll */
+      });
+    } else {
+      v.pause();
     }
-  }, [autoplay, videoRef]);
+  }, [autoplay]);
 
   const latest = data.length > 0 ? data[data.length - 1] : GROWTH_DATA[0];
 
@@ -97,7 +105,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
       {/* Video Section */}
       <div className="relative aspect-video overflow-hidden py-4">
         <video
-          ref={setVideoRef}
+          ref={videoRef}
           src={videoSrc}
           autoPlay
           loop
@@ -106,24 +114,30 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
           webkit-playsinline="true"
           className="w-full h-full object-cover scale-150 origin-center"
           preload="auto"
-          onError={() => {
-            console.log('Card video failed to load');
-          }}
-          onLoadStart={() => {
-            console.log('Card video started loading');
-          }}
-          onCanPlay={() => {
-            console.log('Card video can play');
-          }}
           onPlay={() => {
-            console.log('Card video is playing');
+            // Force an immediate sync when the video actually starts playing
+            const v = videoRef.current;
+            if (!v) return;
+            const duration = (!isNaN(v.duration) && v.duration > 0) ? v.duration : videoDuration || 1;
+            const progress = Math.min((v.currentTime / duration) * 2, 1);
+            const targetIndex = Math.min(
+              GROWTH_DATA.length,
+              Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1)
+            );
+            setIndex((prev) => {
+              if (prev !== targetIndex) {
+                setData(GROWTH_DATA.slice(0, targetIndex));
+                return targetIndex;
+              }
+              return prev;
+            });
           }}
         />
-        
+
         {/* Video Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
-      
+
       {/* Tree Data Cards */}
       <div className="p-4">
         {/* Static Text */}
@@ -132,33 +146,33 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
             One mahogany tree absorbs ~2.54 tonnes<br />of tCO₂e in 40 years.
           </span>
         </div>
-        
+
         <div className="grid grid-cols-3 gap-3 mb-4">
           {/* AGE Card */}
           <div className="bg-gray-800/80 rounded-lg p-3 text-center">
             <div className="text-xs uppercase text-gray-300 mb-1">AGE</div>
             <div className="text-lg font-bold text-white">{latest.age.toFixed(2)} yrs</div>
           </div>
-          
+
           {/* DBH Card */}
           <div className="bg-gray-800/80 rounded-lg p-3 text-center">
             <div className="text-xs uppercase text-gray-300 mb-1">DBH</div>
             <div className="text-lg font-bold text-white">{latest.dbh.toFixed(2)} cm</div>
           </div>
-          
+
           {/* CO₂E Card */}
           <div className="bg-gray-800/80 rounded-lg p-3 text-center">
             <div className="text-xs uppercase text-gray-300 mb-1">CO₂E</div>
             <div className="text-lg font-bold text-white">{latest.co2e.toFixed(2)} t</div>
           </div>
         </div>
-        
+
         {/* Pause Button */}
-        <button 
+        <button
           onClick={() => setAutoplay((a) => !a)}
           className="w-full bg-gray-800/80 hover:bg-gray-700/80 text-white font-medium py-3 px-4 rounded-lg transition-colors"
         >
-          {autoplay ? "Pause" : "Play"}
+          {autoplay ? 'Pause' : 'Play'}
         </button>
       </div>
     </motion.div>

@@ -1,3 +1,4 @@
+// HeroFloraCarbonAI.tsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
@@ -18,7 +19,7 @@ const GROWTH_DATA = [
   { age: 40, dbh: 41.06907, co2e: 2.50817497 },
 ];
 
-// Small metric box component
+// Small metric box component (unchanged)
 function MetricBox({ label, value, unit }: { label: string; value: number; unit: string }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl bg-black/40 px-4 py-2 text-center ring-1 ring-white/10 backdrop-blur-sm w-28">
@@ -35,74 +36,52 @@ interface HeroFloraCarbonAIProps {
 }
 
 export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps = {}) {
-  // Initialize to starting state and autoplay enabled
   const [data, setData] = useState<any[]>([]);
   const [index, setIndex] = useState<number>(1);
   const [autoplay, setAutoplay] = useState<boolean>(true);
   const [videoDuration, setVideoDuration] = useState(10);
-  // Video-synchronized animation (attach listeners regardless of autoplay)
+
+  // Keep duration in sync
   useEffect(() => {
-    const videoElement = videoRef?.current;
-    if (!videoElement) return;
-
-    const updateDataFromVideo = () => {
-      if (!videoElement) return;
-      
-      const currentTime = videoElement.currentTime;
-      const duration = videoDuration;
-      
-      // Map video time to data index (0 to GROWTH_DATA.length-1)
-      // Improved sync: use more precise mapping
-      const progress = Math.min(currentTime / duration, 1);
-      const targetIndex = Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1);
-      
-      if (targetIndex !== index && targetIndex <= GROWTH_DATA.length) {
-        setIndex(targetIndex);
-        setData(GROWTH_DATA.slice(0, targetIndex));
-      }
+    const v = videoRef?.current;
+    if (!v) return;
+    const onLoaded = () => {
+      if (!isNaN(v.duration) && v.duration > 0) setVideoDuration(v.duration);
     };
+    v.addEventListener('loadedmetadata', onLoaded);
+    if (v.readyState >= 1 && !isNaN(v.duration) && v.duration > 0) setVideoDuration(v.duration);
+    return () => v.removeEventListener('loadedmetadata', onLoaded);
+  }, [videoRef]);
 
-    const handleTimeUpdate = () => updateDataFromVideo();
-    const handleLoadedMetadata = () => {
-      setVideoDuration(videoElement.duration);
-      // Force initial update after metadata loads
-      setTimeout(updateDataFromVideo, 100);
-    };
-    
-  videoElement.addEventListener('timeupdate', handleTimeUpdate);
-  videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
-  // Also update on play to cover autoplay start
-  videoElement.addEventListener('play', handleTimeUpdate);
-    
-    // Initial update
-    // Initial update if metadata already loaded
-    if (videoElement.readyState >= 1) {
-      updateDataFromVideo();
-    }
-
-    return () => {
-      if (videoElement) {
-        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
-        videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        videoElement.removeEventListener('play', handleTimeUpdate);
-      }
-    };
-  }, [videoRef, autoplay, index, videoDuration]);
-
-  // Sync video playback with animation state
+  // rAF loop polling the passed videoRef
   useEffect(() => {
-    const videoElement = videoRef?.current;
-    if (videoElement) {
-      if (autoplay) {
-        videoElement.play().then(() => {
-          // Dispatch initial timeupdate to sync metrics immediately
-          videoElement.dispatchEvent(new Event('timeupdate'));
-        }).catch(() => {});
-      } else {
-        videoElement.pause();
+    let rafId = 0;
+
+    const tick = () => {
+      const v = videoRef?.current;
+      if (v && autoplay && !v.paused) {
+        const duration = (!isNaN(v.duration) && v.duration > 0) ? v.duration : videoDuration || 1;
+        const currentTime = Math.max(0, v.currentTime || 0);
+        const progress = Math.min(currentTime / duration, 1);
+        const targetIndex = Math.min(
+          GROWTH_DATA.length,
+          Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1)
+        );
+
+        setIndex((prev) => {
+          if (prev !== targetIndex) {
+            setData(GROWTH_DATA.slice(0, targetIndex));
+            return targetIndex;
+          }
+          return prev;
+        });
       }
-    }
-  }, [autoplay, videoRef]);
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [videoRef, autoplay, videoDuration]);
 
   const latest = data.length > 0 ? data[data.length - 1] : GROWTH_DATA[0];
 
@@ -116,36 +95,31 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
     >
       {/* 1. This container for the tree creates the positioning boundary. */}
       <div className="relative w-full h-80">
-        {/* The Tree Image */}
         <div
           className="w-full h-full bg-contain bg-no-repeat bg-center"
           style={{ backgroundImage: "url('/tree-image.png')" }}
         />
       </div>
 
-      {/* 2. This container holds the UI elements */}
+      {/* 2. UI elements */}
       <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[50px] mr-[200px]">
         <span className="text-s font-semibold text-black mb-1">
-              One mahogany tree absorbs<br />~2.54 tonnes of tCO₂e in 40 years.
-            </span>
-        {/* Metric Boxes */}
+          One mahogany tree absorbs<br />~2.54 tonnes of tCO₂e in 40 years.
+        </span>
         <div className="grid grid-cols-3 gap-3">
           <MetricBox label="Age" value={latest.age} unit="yrs" />
           <MetricBox label="DBH" value={latest.dbh} unit="cm" />
           <div className="flex flex-col items-center">
-            {/* Added species name above CO₂ box */}
-            
             <MetricBox label="CO₂e" value={latest.co2e} unit="t" />
           </div>
         </div>
 
-        {/* Controls */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setAutoplay((a) => !a)}
             className="rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm px-3 py-1 text-xs text-white/90 hover:bg-white/20"
           >
-            {autoplay ? "Pause" : "Play"}
+            {autoplay ? 'Pause' : 'Play'}
           </button>
         </div>
       </div>

@@ -211,7 +211,7 @@ const HomePage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
           >
             <a
-              href="http://3.106.165.15:8000/"
+              href="https://carbon-calculator.floracarbon.ai/"
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"

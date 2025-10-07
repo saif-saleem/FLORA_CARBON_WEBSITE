@@ -97,7 +97,7 @@ const ContactPage: React.FC = () => {
           >
             <ContactItem icon={Mail} title="Email" detail="manir@floracarbon.ai" href="mailto:manir@floracarbon.ai" />
             <ContactItem icon={Phone} title="Phone" detail="+91 81696 01563" href="tel:+918169601563" />
-            <ContactItem icon={MapPin} title="Office" detail="Saltlake, Kolkata, India" />
+            <ContactItem icon={MapPin} title="Office" detail="Corporate office - Millennium City IT Park, Tower II, Floor 6, DN Block, Sector V, Bidhannagar, Kolkata - 700091, India" />
           </motion.div>
 
           <motion.div

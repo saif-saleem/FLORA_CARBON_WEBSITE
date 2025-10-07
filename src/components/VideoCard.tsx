@@ -147,33 +147,26 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
           {/* AGE Card */}
-          <div className="bg-gray-800/80 rounded-lg p-3 text-center">
-            <div className="text-xs uppercase text-gray-300 mb-1">AGE</div>
-            <div className="text-lg font-bold text-white">{latest.age.toFixed(2)} yrs</div>
+          <div className="bg-gray-800/80 rounded-lg p-2 sm:p-3 text-center">
+            <div className="text-[10px] sm:text-xs uppercase text-gray-300 mb-1">AGE</div>
+            <div className="text-sm sm:text-lg font-bold text-white">{latest.age.toFixed(2)} yrs</div>
           </div>
 
           {/* DBH Card */}
-          <div className="bg-gray-800/80 rounded-lg p-3 text-center">
-            <div className="text-xs uppercase text-gray-300 mb-1">DBH</div>
-            <div className="text-lg font-bold text-white">{latest.dbh.toFixed(2)} cm</div>
+          <div className="bg-gray-800/80 rounded-lg p-2 sm:p-3 text-center">
+            <div className="text-[10px] sm:text-xs uppercase text-gray-300 mb-1">DBH</div>
+            <div className="text-sm sm:text-lg font-bold text-white">{latest.dbh.toFixed(2)} cm</div>
           </div>
 
           {/* CO₂E Card */}
-          <div className="bg-gray-800/80 rounded-lg p-3 text-center">
-            <div className="text-xs uppercase text-gray-300 mb-1">CO₂E</div>
-            <div className="text-lg font-bold text-white">{latest.co2e.toFixed(2)} t</div>
+          <div className="bg-gray-800/80 rounded-lg p-2 sm:p-3 text-center">
+            <div className="text-[10px] sm:text-xs uppercase text-gray-300 mb-1">CO₂E</div>
+            <div className="text-sm sm:text-lg font-bold text-white">{latest.co2e.toFixed(2)} t</div>
           </div>
         </div>
 
-        {/* Pause Button */}
-        <button
-          onClick={() => setAutoplay((a) => !a)}
-          className="w-full bg-gray-800/80 hover:bg-gray-700/80 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-        >
-          {autoplay ? 'Pause' : 'Play'}
-        </button>
       </div>
     </motion.div>
   );

@@ -22,9 +22,9 @@ const GROWTH_DATA = [
 // Small metric box component (unchanged)
 function MetricBox({ label, value, unit }: { label: string; value: number; unit: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl bg-black/40 px-4 py-2 text-center ring-1 ring-white/10 backdrop-blur-sm w-28">
-      <span className="text-[10px] uppercase tracking-wide text-black-100">{label}</span>
-      <span className="text-sm font-semibold text-black-100">
+    <div className="flex flex-col items-center justify-center rounded-xl bg-black/40 px-2 sm:px-4 py-2 text-center ring-1 ring-white/10 backdrop-blur-sm w-20 sm:w-28">
+      <span className="text-[8px] sm:text-[10px] uppercase tracking-wide text-black-100">{label}</span>
+      <span className="text-xs sm:text-sm font-semibold text-black-100">
         {value.toFixed(2)} {unit}
       </span>
     </div>
@@ -106,7 +106,7 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
         <span className="text-s font-semibold text-black mb-1">
           One mahogany tree absorbs<br />~2.54 tonnes of tCO₂e in 40 years.
         </span>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <MetricBox label="Age" value={latest.age} unit="yrs" />
           <MetricBox label="DBH" value={latest.dbh} unit="cm" />
           <div className="flex flex-col items-center">
@@ -114,14 +114,6 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setAutoplay((a) => !a)}
-            className="rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm px-3 py-1 text-xs text-white/90 hover:bg-white/20"
-          >
-            {autoplay ? 'Pause' : 'Play'}
-          </button>
-        </div>
       </div>
     </motion.div>
   );

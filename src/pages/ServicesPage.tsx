@@ -11,8 +11,8 @@ const services = [
   },
   {
     icon: BarChart3,
-    title: "AI-Powered MRV Platform",
-    content: "Advanced biomass estimation can be achieved using AI, leveraging satellite imagery analysis to monitor forests effectively. Machine learning techniques enable accurate estimation of carbon sequestration, while real-time data collection and processing ensures up-to-date insights. Additionally, automated verification support streamlines compliance, and custom MRV (Monitoring, Reporting, and Verification) dashboards provide comprehensive reporting for efficient decision-making."
+    title: "Carbon Calculator Tool",
+    content: "Estimate species-specific biomass and carbon credits with validated allometric equations - use the tool to plan which species to plant for higher carbon yield and to calculate credits for trees you’ve already planted."
   },
   {
     icon: Leaf,

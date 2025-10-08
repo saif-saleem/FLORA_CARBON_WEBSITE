@@ -102,7 +102,7 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
 
       <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[50px] mr-[200px]">
         <span className="text-s font-semibold text-black mb-1">
-          One mahogany tree absorbs<br />~2.54 tonnes of tCO₂e in 40 years.
+          One mahogany tree absorbs<br />~2.50 tonnes of tCO₂e in 40 years.
         </span>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <MetricBox label="Age" value={latest.age} unit="yrs" />

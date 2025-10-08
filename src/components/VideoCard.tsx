@@ -142,7 +142,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
         {/* Static Text */}
         <div className="text-center mb-4">
           <span className="text-sm font-semibold text-black">
-            One mahogany tree absorbs ~2.54 tonnes<br />of tCO₂e in 40 years.
+            One mahogany tree absorbs ~2.50 tonnes<br />of tCO₂e in 40 years.
           </span>
         </div>
 

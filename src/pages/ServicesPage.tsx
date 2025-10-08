@@ -7,7 +7,7 @@ const services = [
   {
     icon: Leaf,
     title: "Flora Carbon GPT",
-    content: "Your intelligent climate companion powered by advanced AI. Get instant, expert-level answers about carbon footprints, sustainability strategies, and nature-based climate solutions."
+    content: "Get instant, expert answers on Forestry Carbon project requirements across VCS, Gold Standard, Plan Vivo, and ICR - powered by our Custom GPT trained on real project data and the standards requirements."
   },
   {
     icon: BarChart3,

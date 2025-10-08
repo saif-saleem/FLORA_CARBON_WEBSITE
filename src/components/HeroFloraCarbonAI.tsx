@@ -19,7 +19,8 @@ const GROWTH_DATA = [
   { age: 40, dbh: 41.06907, co2e: 2.50817497 },
 ];
 
-// Small metric box component (unchanged)
+const SPEED_MULTIPLIER = 2; // 👈 Faster data animation
+
 function MetricBox({ label, value, unit }: { label: string; value: number; unit: string }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl bg-black/40 px-2 sm:px-4 py-2 text-center ring-1 ring-white/10 backdrop-blur-sm w-20 sm:w-28">
@@ -41,7 +42,6 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
   const [autoplay, setAutoplay] = useState<boolean>(true);
   const [videoDuration, setVideoDuration] = useState(10);
 
-  // Keep duration in sync
   useEffect(() => {
     const v = videoRef?.current;
     if (!v) return;
@@ -53,16 +53,17 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
     return () => v.removeEventListener('loadedmetadata', onLoaded);
   }, [videoRef]);
 
-  // rAF loop polling the passed videoRef
   useEffect(() => {
     let rafId = 0;
-
     const tick = () => {
       const v = videoRef?.current;
       if (v && autoplay && !v.paused) {
         const duration = (!isNaN(v.duration) && v.duration > 0) ? v.duration : videoDuration || 1;
         const currentTime = Math.max(0, v.currentTime || 0);
-        const progress = Math.min(currentTime / duration, 1);
+
+        // 👇 Faster data progression
+        const progress = Math.min((currentTime / duration) * SPEED_MULTIPLIER, 1);
+
         const targetIndex = Math.min(
           GROWTH_DATA.length,
           Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1)
@@ -78,7 +79,6 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
       }
       rafId = requestAnimationFrame(tick);
     };
-
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
   }, [videoRef, autoplay, videoDuration]);
@@ -93,7 +93,6 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
       transition={{ duration: 1 }}
       className="flex flex-col items-center"
     >
-      {/* 1. This container for the tree creates the positioning boundary. */}
       <div className="relative w-full h-80">
         <div
           className="w-full h-full bg-contain bg-no-repeat bg-center"
@@ -101,7 +100,6 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
         />
       </div>
 
-      {/* 2. UI elements */}
       <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[50px] mr-[200px]">
         <span className="text-s font-semibold text-black mb-1">
           One mahogany tree absorbs<br />~2.54 tonnes of tCO₂e in 40 years.
@@ -113,7 +111,6 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
             <MetricBox label="CO₂e" value={latest.co2e} unit="t" />
           </div>
         </div>
-
       </div>
     </motion.div>
   );

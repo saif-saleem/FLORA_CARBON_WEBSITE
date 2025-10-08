@@ -19,6 +19,8 @@ const GROWTH_DATA = [
   { age: 40, dbh: 41.06907, co2e: 2.50817497 },
 ];
 
+const SPEED_MULTIPLIER = 2; // 👈 Adjust this to control how fast growth data updates
+
 interface VideoCardProps {
   videoSrc: string;
   className?: string;
@@ -28,7 +30,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
   const [data, setData] = useState<any[]>([]);
   const [index, setIndex] = useState(1);
   const [autoplay, setAutoplay] = useState(true);
-  const videoRef = useRef<HTMLVideoElement | null>(null); // <-- stable ref (was state before)
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoDuration, setVideoDuration] = useState(10);
 
   // Keep videoDuration up-to-date
@@ -39,7 +41,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
       if (!isNaN(v.duration) && v.duration > 0) setVideoDuration(v.duration);
     };
     v.addEventListener('loadedmetadata', onLoaded);
-    // also call once if metadata already ready
     if (v.readyState >= 1 && !isNaN(v.duration) && v.duration > 0) setVideoDuration(v.duration);
     return () => v.removeEventListener('loadedmetadata', onLoaded);
   }, []);
@@ -53,14 +54,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
       if (v && autoplay && !v.paused) {
         const duration = (!isNaN(v.duration) && v.duration > 0) ? v.duration : videoDuration || 1;
         const currentTime = Math.max(0, v.currentTime || 0);
-        // same mapping you used (faster animation by *2)
-        const progress = Math.min((currentTime / duration) * 2, 1);
+
+        // 👇 Modified: Use speed multiplier for faster data animation
+        const progress = Math.min((currentTime / duration) * SPEED_MULTIPLIER, 1);
+
         const targetIndex = Math.min(
           GROWTH_DATA.length,
           Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1)
         );
 
-        // functional update to avoid stale closures
         setIndex((prev) => {
           if (prev !== targetIndex) {
             setData(GROWTH_DATA.slice(0, targetIndex));
@@ -74,16 +76,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
 
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [autoplay, videoDuration]); // runs while autoplay changes
+  }, [autoplay, videoDuration]);
 
   // Sync video element play/pause with autoplay state
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     if (autoplay) {
-      v.play().catch(() => {
-        /* ignore autoplay block errors — loop will still poll */
-      });
+      v.play().catch(() => {});
     } else {
       v.pause();
     }
@@ -115,11 +115,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
           className="w-full h-full object-cover scale-150 origin-center"
           preload="auto"
           onPlay={() => {
-            // Force an immediate sync when the video actually starts playing
             const v = videoRef.current;
             if (!v) return;
             const duration = (!isNaN(v.duration) && v.duration > 0) ? v.duration : videoDuration || 1;
-            const progress = Math.min((v.currentTime / duration) * 2, 1);
+            const progress = Math.min((v.currentTime / duration) * SPEED_MULTIPLIER, 1);
             const targetIndex = Math.min(
               GROWTH_DATA.length,
               Math.max(1, Math.floor(progress * (GROWTH_DATA.length - 1)) + 1)
@@ -166,7 +165,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
             <div className="text-sm sm:text-lg font-bold text-white">{latest.co2e.toFixed(2)} t</div>
           </div>
         </div>
-
       </div>
     </motion.div>
   );

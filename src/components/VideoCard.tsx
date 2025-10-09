@@ -97,8 +97,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className={`
-        relative overflow-hidden rounded-xl border border-gray-200/20 
-        bg-white/10 backdrop-blur-sm shadow-lg w-full max-w-lg
+        relative overflow-hidden w-full max-w-lg
         ${className}
       `}
     >
@@ -133,8 +132,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, className = '' }) => {
           }}
         />
 
-        {/* Video Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        {/* Video Overlay - removed gray background */}
       </div>
 
       {/* Tree Data Cards */}

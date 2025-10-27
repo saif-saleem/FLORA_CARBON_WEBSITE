@@ -111,7 +111,8 @@ const HomePage: React.FC = () => {
                 transition={{ duration: 1, delay: 0.8 }}
                 className="mt-8"
               >
-                <Link to="/services" className="btn-primary text-sm sm:text-base">Our Technology</Link>
+                <Link to="/services" className="btn-primary text-sm sm:text-base mr-4">Our Technology</Link>
+                <Link to="/pricing" className="btn-secondary text-sm sm:text-base">View Pricing</Link>
               </motion.div>
             </div>
 
@@ -144,7 +145,8 @@ const HomePage: React.FC = () => {
               transition={{ duration: 1, delay: 0.8 }}
                 className="mt-8"
             >
-                <Link to="/services" className="btn-primary text-sm sm:text-base">Our Technology</Link>
+                <Link to="/services" className="btn-primary text-sm sm:text-base mr-4">Our Technology</Link>
+                <Link to="/pricing" className="btn-secondary text-sm sm:text-base">View Pricing</Link>
             </motion.div>
           </div>
 

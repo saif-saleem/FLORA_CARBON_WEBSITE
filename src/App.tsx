@@ -6,6 +6,7 @@ import ServicesPage from './pages/ServicesPage';
 import TeamPage from './pages/TeamPage';
 import ContactPage from './pages/ContactPage';
 import AuthPage from './pages/AuthPage';
+import PricingPage from './pages/PricingPage';
 import AnimatedCursor from './components/AnimatedCursor';
 
 const ScrollToTop = () => {
@@ -28,6 +29,7 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/team" element={<TeamPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           {/* The /auth route is now inside the main Layout */}
           <Route path="/auth" element={<AuthPage />} />
         </Routes>

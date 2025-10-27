@@ -7,6 +7,7 @@ import Logo from '../assets/logo.tsx';
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'Services', path: '/services' },
+  { name: 'Pricing', path: '/pricing' },
   { name: 'Team', path: '/team' },
   { name: 'Contact', path: '/contact' },
 ];

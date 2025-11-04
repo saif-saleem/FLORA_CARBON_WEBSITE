@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Lock, Mail } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // Correct way to read Vite env vars
 const { VITE_BACKEND_URL, VITE_CARBONGPT_URL } = import.meta.env;
+//hii this is test comment
+interface SignInResponse {
+  token: string;
+  name: string;
+}
+
+interface GetUserResponse {
+  name: string;
+  email: string;
+}
 
 const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const navigate = useNavigate();
 
   const { name, email, password } = formData;
   const BACKEND_URL = VITE_BACKEND_URL || 'http://localhost:5000';
@@ -25,13 +33,44 @@ const AuthPage: React.FC = () => {
         await axios.post(`${BACKEND_URL}/api/auth/signup`, { name, email, password });
         alert('Registration successful! Please sign in.');
         setIsSignUp(false);
-      } catch (err) {
-        alert('Error: User may already exist or server is down.');
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          alert(err.response?.data?.message || 'Error: User may already exist or server is down.');
+        } else {
+          alert('Error: User may already exist or server is down.');
+        }
       }
     } else {
       try {
-        const res = await axios.post(`${BACKEND_URL}/api/auth/signin`, { email, password });
-        localStorage.setItem('token', res.data.token);
+        const res = await axios.post<SignInResponse>(`${BACKEND_URL}/api/auth/signin`, { email, password });
+        const token = res.data.token;
+        localStorage.setItem('token', token);
+
+        // Fetch user details using the token
+        try {
+          const userRes = await axios.get<GetUserResponse>(`${BACKEND_URL}/api/auth/get`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          // Store user details in localStorage
+          localStorage.setItem('userName', userRes.data.name);
+          localStorage.setItem('userEmail', userRes.data.email);
+
+          // Debug: Print username and email in browser console
+          console.log('✅ User details fetched successfully!');
+          console.log('👤 Username:', userRes.data.name);
+          console.log('📧 Email:', userRes.data.email);
+          console.log('📦 Full user data:', { name: userRes.data.name, email: userRes.data.email });
+        } catch (getErr: unknown) {
+          console.error('❌ Error fetching user details:', getErr);
+          // Still store the name from signin response as fallback
+          localStorage.setItem('userName', res.data.name);
+          console.log('⚠️ Using fallback username from signin response');
+          console.log('👤 Username:', res.data.name);
+        }
+
         // Redirect to external GPT app (read from env)
         if (VITE_CARBONGPT_URL) {
           window.location.href = VITE_CARBONGPT_URL;
@@ -39,8 +78,12 @@ const AuthPage: React.FC = () => {
           // fallback: redirect to new server
           window.location.href = 'http://13.126.242.182:8501';
         }
-      } catch (err) {
-        alert('Error: Invalid credentials.');
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          alert(err.response?.data?.message || 'Error: Invalid credentials.');
+        } else {
+          alert('Error: Invalid credentials.');
+        }
       }
     }
   };

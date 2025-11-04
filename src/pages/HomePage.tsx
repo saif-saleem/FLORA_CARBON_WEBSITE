@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Leaf, BrainCircuit, Bot, ChevronDown } from 'lucide-react';
 import CarbonCalculator from '../components/CarbonCalculator'; // Assuming this component is used elsewhere or will be.
+import { redirectToGPT } from '../utils/auth';
 
 // Import video + fallback image
 import forestVideo from '../assets/fright.mp4';
@@ -183,14 +184,17 @@ const HomePage: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <Link
-              to="/auth"
+            <button
+              onClick={() => {
+                const { VITE_CARBONGPT_URL } = import.meta.env;
+                redirectToGPT(VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/');
+              }}
               className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
             >
               <Bot className="h-5 w-5 group-hover:animate-pulse" />
               Start Chatting with Flora Carbon GPT
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-            </Link>
+            </button>
             <p className="text-sm text-gray-400 mt-4">Free to use • Powered by AI</p>
           </motion.div>
         </div>

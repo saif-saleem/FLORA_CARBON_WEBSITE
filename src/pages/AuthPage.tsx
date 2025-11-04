@@ -71,13 +71,9 @@ const AuthPage: React.FC = () => {
           console.log('👤 Username:', res.data.name);
         }
 
-        // Redirect to external GPT app (read from env)
-        if (VITE_CARBONGPT_URL) {
-          window.location.href = VITE_CARBONGPT_URL;
-        } else {
-          // fallback: redirect to new server
-          window.location.href = 'http://13.126.242.182:8501';
-        }
+        // Redirect to home page after successful login
+        // User can then click "Start Chatting" button to access GPT app
+        window.location.href = '/';
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
           alert(err.response?.data?.message || 'Error: Invalid credentials.');

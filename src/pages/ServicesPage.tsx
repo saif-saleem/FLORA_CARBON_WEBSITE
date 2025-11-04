@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, BarChart3, GraduationCap, Plus, Minus, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom'; // 1. Import the Link component
+import { redirectToGPT } from '../utils/auth';
 
 const services = [
   {
@@ -84,14 +85,17 @@ const ServicesPage: React.FC = () => {
                           transition={{ duration: 0.6, delay: 0.5 }}
                         >
                           {/* --- START: Edited Button Code --- */}
-                          <Link
-                            to="/auth" // 2. Changed the link to the auth page
+                          <button
+                            onClick={() => {
+                              const { VITE_CARBONGPT_URL } = import.meta.env;
+                              redirectToGPT(VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/');
+                            }}
                             className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
                           >
                             <Bot className="h-5 w-5 group-hover:animate-pulse" />
                             Start Chatting with Flora Carbon GPT
                             <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                          </Link>
+                          </button>
                           {/* --- END: Edited Button Code --- */}
                         </motion.div>
                       )}

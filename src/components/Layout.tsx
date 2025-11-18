@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon } from 'lucide-react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import Logo from '../assets/logo.tsx';
+import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'Services', path: '/services' },
   { name: 'Pricing', path: '/pricing' },
-  // { name: 'Blogs', path: '/blogs' },
+  { name: 'Blogs', path: '/blogs' },
   { name: 'Team', path: '/team' },
   { name: 'Contact', path: '/contact' },
 ];
@@ -18,6 +19,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { scrollYProgress } = useScroll();
+  const { isAuthenticated, user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -136,17 +138,39 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               })}
             </nav>
 
-            {/* Right: CTA */}
-            <div className="hidden md:flex shrink-0">
-              <Link
-                to="/auth"
-                className="relative inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white
-                           bg-gradient-to-r from-emerald-500 to-teal-500
-                           shadow-md hover:shadow-lg hover:shadow-emerald-500/25 transition-all duration-200
-                           ring-1 ring-emerald-600/30"
-              >
-                <span className="relative z-10">Sign In</span>
-              </Link>
+            {/* Right: CTA or User Menu */}
+            <div className="hidden md:flex shrink-0 items-center gap-3">
+              {isAuthenticated && user ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <UserIcon size={16} className="text-emerald-600" />
+                    <span className="text-sm font-medium text-gray-800">{user.name}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      window.location.href = '/';
+                    }}
+                    className="relative inline-flex items-center justify-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold text-white
+                               bg-gradient-to-r from-red-500 to-red-600
+                               shadow-md hover:shadow-lg hover:shadow-red-500/25 transition-all duration-200
+                               ring-1 ring-red-600/30"
+                  >
+                    <LogOut size={16} />
+                    <span className="relative z-10">Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="relative inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white
+                             bg-gradient-to-r from-emerald-500 to-teal-500
+                             shadow-md hover:shadow-lg hover:shadow-emerald-500/25 transition-all duration-200
+                             ring-1 ring-emerald-600/30"
+                >
+                  <span className="relative z-10">Sign In</span>
+                </Link>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -188,13 +212,34 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   {item.name}
                 </Link>
               ))}
-              <Link
-                to="/auth"
-                className="text-2xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-3 rounded-full mt-4 shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                tabIndex={isMenuOpen ? 0 : -1}
-              >
-                Sign In
-              </Link>
+              {isAuthenticated && user ? (
+                <>
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 mt-4">
+                    <UserIcon size={20} className="text-emerald-300" />
+                    <span className="text-xl font-semibold text-white">{user.name}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                      window.location.href = '/';
+                    }}
+                    className="text-2xl font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-8 py-3 rounded-full mt-4 shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center gap-2 mx-auto"
+                    tabIndex={isMenuOpen ? 0 : -1}
+                  >
+                    <LogOut size={20} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="text-2xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-3 rounded-full mt-4 shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  tabIndex={isMenuOpen ? 0 : -1}
+                >
+                  Sign In
+                </Link>
+              )}
             </nav>
           </motion.div>
         )}

@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Leaf, BrainCircuit, Bot, ChevronDown } from 'lucide-react';
 import CarbonCalculator from '../components/CarbonCalculator'; // Assuming this component is used elsewhere or will be.
 import { redirectToGPT } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
+import UpgradePrompt from '../components/UpgradePrompt';
 
 // Import video + fallback image
 import forestVideo from '../assets/fright.mp4';
@@ -17,7 +19,9 @@ import VideoCard from '../components/VideoCard';
 const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [shouldPlayVideo, setShouldPlayVideo] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const desktopVideoRef = React.useRef<HTMLVideoElement>(null);
+  const { isAuthenticated, checkGptAccess, trialStatus } = useAuth();
 
   useEffect(() => {
     // Detect mobile device
@@ -185,9 +189,30 @@ const HomePage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
           >
             <button
-              onClick={() => {
-                const { VITE_CARBONGPT_URL } = import.meta.env;
-                redirectToGPT(VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/');
+              onClick={async () => {
+                if (!isAuthenticated) {
+                  window.location.href = '/auth';
+                  return;
+                }
+
+                try {
+                  const accessCheck = await checkGptAccess();
+                  if (accessCheck.hasAccess) {
+                    const { VITE_CARBONGPT_URL } = import.meta.env;
+                    await redirectToGPT(
+                      VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/',
+                      checkGptAccess
+                    );
+                  } else {
+                    setShowUpgradePrompt(true);
+                  }
+                } catch (error: any) {
+                  if (error.message) {
+                    setShowUpgradePrompt(true);
+                  } else {
+                    alert('Unable to access GPT. Please try again.');
+                  }
+                }
               }}
               className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
             >
@@ -307,6 +332,14 @@ const HomePage: React.FC = () => {
           <Link to="/contact" className="btn-primary">Partner With Us</Link>
         </div>
       </section>
+
+      {/* Upgrade Prompt */}
+      <UpgradePrompt
+        isOpen={showUpgradePrompt}
+        onClose={() => setShowUpgradePrompt(false)}
+        daysRemaining={trialStatus?.daysRemaining || 0}
+        hasUsedTrial={trialStatus?.hasUsedTrial || false}
+      />
     </div>
   );
 };

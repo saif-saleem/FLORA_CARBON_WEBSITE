@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, BarChart3, GraduationCap, Plus, Minus, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom'; // 1. Import the Link component
 import { redirectToGPT } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
+import UpgradePrompt from '../components/UpgradePrompt';
 
 const services = [
   {
@@ -29,6 +31,8 @@ const services = [
 
 const ServicesPage: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const { isAuthenticated, checkGptAccess, trialStatus } = useAuth();
 
   return (
     <div className="bg-gradient-to-b from-emerald-950 to-black text-white">
@@ -86,9 +90,30 @@ const ServicesPage: React.FC = () => {
                         >
                           {/* --- START: Edited Button Code --- */}
                           <button
-                            onClick={() => {
-                              const { VITE_CARBONGPT_URL } = import.meta.env;
-                              redirectToGPT(VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/');
+                            onClick={async () => {
+                              if (!isAuthenticated) {
+                                window.location.href = '/auth';
+                                return;
+                              }
+
+                              try {
+                                const accessCheck = await checkGptAccess();
+                                if (accessCheck.hasAccess) {
+                                  const { VITE_CARBONGPT_URL } = import.meta.env;
+                                  await redirectToGPT(
+                                    VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/',
+                                    checkGptAccess
+                                  );
+                                } else {
+                                  setShowUpgradePrompt(true);
+                                }
+                              } catch (error: any) {
+                                if (error.message) {
+                                  setShowUpgradePrompt(true);
+                                } else {
+                                  alert('Unable to access GPT. Please try again.');
+                                }
+                              }
                             }}
                             className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
                           >
@@ -107,6 +132,14 @@ const ServicesPage: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Upgrade Prompt */}
+      <UpgradePrompt
+        isOpen={showUpgradePrompt}
+        onClose={() => setShowUpgradePrompt(false)}
+        daysRemaining={trialStatus?.daysRemaining || 0}
+        hasUsedTrial={trialStatus?.hasUsedTrial || false}
+      />
     </div>
   );
 };

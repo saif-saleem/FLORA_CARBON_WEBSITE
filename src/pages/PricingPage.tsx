@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Check, Zap, Users, Building, Crown } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import TrialPopup from '../components/TrialPopup';
+import PaymentModal from '../components/PaymentModal';
 
 const PricingPage: React.FC = () => {
   const [isAnnual, setIsAnnual] = useState(true);
+  const [showTrialPopup, setShowTrialPopup] = useState(false);
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{ type: 'individual' | 'group'; billingCycle: 'monthly' | 'annual' } | null>(null);
+  const { isAuthenticated, startTrial, trialStatus, createPaymentOrder, verifyPayment, refreshTrialStatus } = useAuth();
+  const navigate = useNavigate();
 
   const pricingPlans = [
     {
@@ -43,7 +53,7 @@ const PricingPage: React.FC = () => {
         'Faster response times',
         'Email support'
       ],
-      buttonText: 'Start Free Trial',
+      buttonText: 'Get Started',
       buttonStyle: 'secondary',
       popular: false
     },
@@ -92,6 +102,97 @@ const PricingPage: React.FC = () => {
       popular: false
     }
   ];
+
+  const handleGetStarted = (planId: string) => {
+    if (!isAuthenticated) {
+      // Redirect to sign in
+      navigate('/auth');
+      return;
+    }
+
+    // Check if user already has active subscription
+    if (trialStatus?.hasPaidPlan) {
+      // User already has paid plan, can proceed to GPT
+      const { VITE_CARBONGPT_URL } = import.meta.env;
+      window.location.href = VITE_CARBONGPT_URL || 'http://localhost:5174/';
+      return;
+    }
+
+    if (planId === 'free') {
+      // Free plan - only trial available
+      // Check if user already has active trial
+      if (trialStatus?.isTrialActive && trialStatus.daysRemaining > 0) {
+        // User already has active trial, can proceed to GPT
+        const { VITE_CARBONGPT_URL } = import.meta.env;
+        window.location.href = VITE_CARBONGPT_URL || 'http://localhost:5174/';
+        return;
+      }
+
+      // Check if user has already used trial
+      if (trialStatus?.hasUsedTrial && !trialStatus.isTrialActive) {
+        // Show upgrade prompt
+        alert('You have already used your free trial. Please upgrade to a paid plan to continue.');
+        return;
+      }
+
+      // Show trial popup for free plan
+      setShowTrialPopup(true);
+    } else if (planId === 'individual' || planId === 'group') {
+      // Paid plans - show payment modal
+      setSelectedPlan({
+        type: planId as 'individual' | 'group',
+        billingCycle: isAnnual ? 'annual' : 'monthly',
+      });
+      setShowPaymentModal(true);
+    } else if (planId === 'custom') {
+      // Contact sales for custom plan
+      alert('Please contact our sales team for enterprise plans.');
+    }
+  };
+
+  const handleStartTrial = async () => {
+    setIsStartingTrial(true);
+    try {
+      const result = await startTrial();
+      if (result.success) {
+        setShowTrialPopup(false);
+        // Redirect to GPT app after successful trial start with trialStarted flag
+        const { VITE_CARBONGPT_URL } = import.meta.env;
+        const url = new URL(VITE_CARBONGPT_URL || 'http://localhost:5174/');
+        url.searchParams.set('trialStarted', 'true');
+        const token = localStorage.getItem('token');
+        const userName = localStorage.getItem('userName');
+        const userEmail = localStorage.getItem('userEmail');
+        if (token) url.searchParams.set('token', token);
+        if (userName) url.searchParams.set('name', userName);
+        if (userEmail) url.searchParams.set('email', userEmail);
+        window.location.href = url.toString();
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      alert('Failed to start trial. Please try again.');
+    } finally {
+      setIsStartingTrial(false);
+    }
+  };
+
+  const handlePaymentSuccess = async () => {
+    await refreshTrialStatus();
+    // Redirect to GPT app after successful payment
+    const { VITE_CARBONGPT_URL } = import.meta.env;
+    window.location.href = VITE_CARBONGPT_URL || 'http://localhost:5174/';
+  };
+
+  const getPlanAmount = (planId: string, billingCycle: 'monthly' | 'annual') => {
+    const plan = pricingPlans.find(p => p.id === planId);
+    if (!plan) return 0;
+    
+    // Convert USD to INR (approximate conversion: 1 USD = 83 INR)
+    const usdToInr = 83;
+    const monthlyPrice = (billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice) * usdToInr;
+    return billingCycle === 'annual' ? monthlyPrice * 12 : monthlyPrice;
+  };
 
   const getVolumeDiscounts = () => {
     if (isAnnual) {
@@ -248,6 +349,7 @@ const PricingPage: React.FC = () => {
 
                   {/* Button */}
                   <button
+                    onClick={() => handleGetStarted(plan.id)}
                     className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                       plan.buttonStyle === 'primary'
                         ? 'bg-emerald-600 text-white hover:bg-emerald-700'
@@ -307,6 +409,31 @@ const PricingPage: React.FC = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Trial Popup */}
+      <TrialPopup
+        isOpen={showTrialPopup}
+        onClose={() => setShowTrialPopup(false)}
+        onConfirm={handleStartTrial}
+        isLoading={isStartingTrial}
+      />
+
+      {/* Payment Modal */}
+      {selectedPlan && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => {
+            setShowPaymentModal(false);
+            setSelectedPlan(null);
+          }}
+          planType={selectedPlan.type}
+          billingCycle={selectedPlan.billingCycle}
+          amount={getPlanAmount(selectedPlan.type, selectedPlan.billingCycle)}
+          onPaymentSuccess={handlePaymentSuccess}
+          createOrder={createPaymentOrder}
+          verifyPayment={verifyPayment}
+        />
+      )}
     </div>
   );
 };

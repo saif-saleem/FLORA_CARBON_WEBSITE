@@ -1,17 +1,39 @@
 // Utility functions for authentication and cross-domain navigation
 
 /**
- * Check if user is authenticated (has token in localStorage)
+ * Check if user is authenticated (has valid, non-expired token in localStorage)
  */
 export const isAuthenticated = (): boolean => {
   const token = localStorage.getItem('token');
-  return !!token;
+  if (!token) {
+    return false;
+  }
+
+  // Check if token has expired (1 hour from login)
+  const expirationTime = localStorage.getItem('tokenExpiration');
+  if (expirationTime) {
+    const expiration = parseInt(expirationTime, 10);
+    if (Date.now() > expiration) {
+      // Token expired, clear it
+      logout();
+      return false;
+    }
+  } else {
+    // If no expiration time is set, assume old token format and clear it
+    logout();
+    return false;
+  }
+
+  return true;
 };
 
 /**
  * Get authentication token from localStorage
  */
 export const getAuthToken = (): string | null => {
+  if (!isAuthenticated()) {
+    return null;
+  }
   return localStorage.getItem('token');
 };
 
@@ -26,10 +48,25 @@ export const getUserData = (): { name: string | null; email: string | null } => 
 };
 
 /**
- * Redirect to GPT app with authentication token
- * Clears localStorage before redirecting (since localStorage is domain-specific)
+ * Logout user by clearing all auth data
  */
-export const redirectToGPT = (gptUrl: string = 'https://gpt.floracarbon.ai/'): void => {
+export const logout = (): void => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('tokenExpiration');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('userEmail');
+};
+
+/**
+ * Redirect to GPT app with authentication token
+ * Note: This function should be called with checkGptAccess from AuthContext first
+ * Note: localStorage is domain-specific, so the GPT app has its own separate storage.
+ * We keep the auth data on the main site so users stay logged in when they return.
+ */
+export const redirectToGPT = async (
+  gptUrl: string = 'https://gpt.floracarbon.ai/',
+  checkGptAccess?: () => Promise<{ hasAccess: boolean; message?: string }>
+): Promise<void> => {
   const token = getAuthToken();
   
   if (!token) {
@@ -39,17 +76,23 @@ export const redirectToGPT = (gptUrl: string = 'https://gpt.floracarbon.ai/'): v
     return;
   }
 
-  // Get user data before clearing
+  // Check GPT access if function is provided
+  if (checkGptAccess) {
+    const accessCheck = await checkGptAccess();
+    if (!accessCheck.hasAccess) {
+      // Access denied - this should be handled by the component showing UpgradePrompt
+      throw new Error(accessCheck.message || 'Access denied');
+    }
+  }
+
+  // Get user data to pass to GPT app
   const userData = getUserData();
   
-  // Clear localStorage on current domain (since it's domain-specific)
-  // The GPT app will receive the token via URL parameter and store it in its own localStorage
-  localStorage.clear();
-  
-  console.log('🧹 Cleared localStorage before redirecting to GPT app');
+  console.log('🔄 Redirecting to GPT app with authentication token');
   console.log('👤 User data that will be passed:', userData);
 
   // Redirect to GPT app with token as URL parameter
+  // The GPT app will receive the token via URL parameter and store it in its own localStorage
   const url = new URL(gptUrl);
   url.searchParams.set('token', token);
   
@@ -61,7 +104,6 @@ export const redirectToGPT = (gptUrl: string = 'https://gpt.floracarbon.ai/'): v
     url.searchParams.set('email', userData.email);
   }
   
-  console.log('🔄 Redirecting to GPT app with authentication token');
   window.location.href = url.toString();
 };
 

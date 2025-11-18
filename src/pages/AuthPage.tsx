@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Lock, Mail } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 // Correct way to read Vite env vars
 const { VITE_BACKEND_URL, VITE_CARBONGPT_URL } = import.meta.env;
@@ -19,6 +20,7 @@ interface GetUserResponse {
 const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const { login } = useAuth();
 
   const { name, email, password } = formData;
   const BACKEND_URL = VITE_BACKEND_URL || 'http://localhost:5000';
@@ -44,9 +46,11 @@ const AuthPage: React.FC = () => {
       try {
         const res = await axios.post<SignInResponse>(`${BACKEND_URL}/api/auth/signin`, { email, password });
         const token = res.data.token;
-        localStorage.setItem('token', token);
 
         // Fetch user details using the token
+        let userName = res.data.name;
+        let userEmail = email; // Use email from form as fallback
+        
         try {
           const userRes = await axios.get<GetUserResponse>(`${BACKEND_URL}/api/auth/get`, {
             headers: {
@@ -54,22 +58,25 @@ const AuthPage: React.FC = () => {
             },
           });
 
-          // Store user details in localStorage
-          localStorage.setItem('userName', userRes.data.name);
-          localStorage.setItem('userEmail', userRes.data.email);
+          userName = userRes.data.name;
+          userEmail = userRes.data.email;
 
           // Debug: Print username and email in browser console
           console.log('✅ User details fetched successfully!');
-          console.log('👤 Username:', userRes.data.name);
-          console.log('📧 Email:', userRes.data.email);
-          console.log('📦 Full user data:', { name: userRes.data.name, email: userRes.data.email });
+          console.log('👤 Username:', userName);
+          console.log('📧 Email:', userEmail);
+          console.log('📦 Full user data:', { name: userName, email: userEmail });
         } catch (getErr: unknown) {
           console.error('❌ Error fetching user details:', getErr);
-          // Still store the name from signin response as fallback
-          localStorage.setItem('userName', res.data.name);
           console.log('⚠️ Using fallback username from signin response');
-          console.log('👤 Username:', res.data.name);
+          console.log('👤 Username:', userName);
         }
+
+        // Use AuthContext to update global auth state
+        login(token, userName, userEmail);
+
+        // Wait a bit for trial status to refresh
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // Redirect to home page after successful login
         // User can then click "Start Chatting" button to access GPT app

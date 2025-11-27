@@ -33,7 +33,7 @@ function App() {
             <Route path="/team" element={<TeamPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/pricing" element={<PricingPage />} />
-             <Route path="/blogs" element={<BlogsPage />} /> 
+             {/* <Route path="/blogs" element={<BlogsPage />} />  */}
             {/* The /auth route is now inside the main Layout */}
             <Route path="/auth" element={<AuthPage />} />
           </Routes>

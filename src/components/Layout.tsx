@@ -9,7 +9,7 @@ const navItems = [
   { name: 'Home', path: '/' },
   { name: 'Services', path: '/services' },
   { name: 'Pricing', path: '/pricing' },
-  { name: 'Blogs', path: '/blogs' },
+  // { name: 'Blogs', path: '/blogs' },
   { name: 'Team', path: '/team' },
   { name: 'Contact', path: '/contact' },
 ];
@@ -66,7 +66,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Scroll progress bar (cinematic touch) */}
       <motion.div
-        className="fixed top-0 left-0 h-[2px] origin-left z-[60] bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400"
+        className="fixed top-0 left-0 h-[2px] origin-left z-[60] bg-[#50B354]"
         style={{ scaleX: scrollYProgress, right: 0 }}
       />
 
@@ -124,7 +124,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     {/* animated underline */}
                     <motion.span
                       layoutId="nav-underline"
-                      className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400`}
+                      className={`absolute -bottom-1 left-0 h-0.5 bg-[#50B354]`}
                       initial={false}
                       animate={{ width: active ? '100%' : '0%' }}
                       transition={{ duration: 0.25 }}
@@ -164,11 +164,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <Link
                   to="/auth"
                   className="relative inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white
-                             bg-gradient-to-r from-emerald-500 to-teal-500
+                             bg-[#50B354]
                              shadow-md hover:shadow-lg hover:shadow-emerald-500/25 transition-all duration-200
                              ring-1 ring-emerald-600/30"
                 >
-                  <span className="relative z-10">Sign In</span>
+                  <span className="relative z-10">Log In</span>
                 </Link>
               )}
             </div>
@@ -237,7 +237,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   className="text-2xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-3 rounded-full mt-4 shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                   tabIndex={isMenuOpen ? 0 : -1}
                 >
-                  Sign In
+                  Log In
                 </Link>
               )}
             </nav>
@@ -245,8 +245,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         )}
       </AnimatePresence>
 
-      {/* add top padding so content doesn't hide under fixed header */}
-      <main className="flex-grow pt-16">
+      <main className="flex-grow">
         {children}
       </main>
 

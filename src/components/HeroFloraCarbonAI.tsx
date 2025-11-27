@@ -21,12 +21,33 @@ const GROWTH_DATA = [
 
 const SPEED_MULTIPLIER = 2; // 👈 Faster data animation
 
-function MetricBox({ label, value, unit }: { label: string; value: number; unit: string }) {
+function MetricCell({
+  label,
+  value,
+  unit,
+  decimals = 2,
+}: {
+  label: string;
+  value: number;
+  unit: string;
+  decimals?: number;
+}) {
+  const formatted =
+    decimals === 0 ? Math.round(value).toString() : value.toFixed(decimals);
+
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl bg-black/40 px-2 sm:px-4 py-2 text-center ring-1 ring-white/10 backdrop-blur-sm w-20 sm:w-28">
-      <span className="text-[8px] sm:text-[10px] uppercase tracking-wide text-black-100">{label}</span>
-      <span className="text-xs sm:text-sm font-semibold text-black-100">
-        {value.toFixed(2)} {unit}
+    <div className="flex flex-col items-center justify-center px-8 py-2 min-w-[100px]">
+      {/* 🔹 Smaller Label */}
+      <span className="text-[8px] sm:text-[10px] italic text-green-800 font-semibold tracking-wide">
+        {label}
+      </span>
+      {/* 🔹 Smaller Number */}
+      <span className="mt-1 text-lg sm:text-xl font-bold text-black leading-tight font-orbitron">
+        {formatted}
+        {/* 🔹 Smaller Unit */}
+        <span className="ml-0.5 text-[8px] sm:text-[10px] font-medium ">
+          {unit}
+        </span>
       </span>
     </div>
   );
@@ -91,26 +112,23 @@ export default function HeroFloraCarbonAI({ videoRef }: HeroFloraCarbonAIProps =
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 1 }}
-      className="flex flex-col items-center"
+      className="flex items-center justify-end mt-20 mr-20 pr-20"
     >
-      <div className="relative w-full h-80">
-        <div
-          className="w-full h-full bg-contain bg-no-repeat bg-center"
-          style={{ backgroundImage: "url('/tree-image.png')" }}
-        />
-      </div>
-
-      <div className="w-full flex flex-col items-center gap-4 mt-4 mt-[50px] mr-[200px]">
-        <span className="text-s font-semibold text-black mb-1">
+      <div className="flex flex-col gap-4">
+        <span className="text-right text-s font-semibold text-black mb-1">
           One mahogany tree absorbs<br />~2.50 tonnes of tCO₂e in 40 years.
         </span>
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <MetricBox label="Age" value={latest.age} unit="yrs" />
-          <MetricBox label="DBH" value={latest.dbh} unit="cm" />
-          <div className="flex flex-col items-center">
-            <MetricBox label="CO₂e" value={latest.co2e} unit="t" />
+
+        <div className="bg-[#E9FBEA] border border-green-200 rounded-lg shadow-sm max-w-xs mx-0 px-2">
+          {/* Inner cells */}
+          <div className="flex items-stretch justify-between">
+            <MetricCell label="Age" value={latest.age ?? 60} unit="yrs" decimals={0} />
+            <MetricCell label="DBH" value={latest.dbh ?? 41.07} unit="cm" decimals={2} />
+            <MetricCell label="CO₂e" value={latest.co2e ?? 2.51} unit="t" decimals={2} />
           </div>
+
         </div>
+
       </div>
     </motion.div>
   );

@@ -1,4 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap');
+
 
 @tailwind base;
 @tailwind components;
@@ -22,6 +25,10 @@
 
   .btn-secondary {
     @apply bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-300 transform hover:scale-105 min-h-[44px] touch-manipulation;
+  }
+
+  .btn-grey-border {
+    @apply bg-transparent border border-[#1B281B99] text-[#1B281B99] hover:bg-primary-50 font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-300 transform hover:scale-105 min-h-[44px] touch-manipulation;
   }
 
   .section-padding {
@@ -52,5 +59,49 @@
   }
   .animate-sheen {
     animation: sheen 2.4s linear infinite;
+  }
+}
+
+/* Custom container */
+.container{
+  position:relative;
+  margin-left:auto;
+  margin-right:auto;
+  padding-right:15px;
+  padding-left:15px
+}
+@media (min-width: 476px){
+  .container{
+    width:100%
+  }
+}
+@media (min-width: 768px){
+  .container{
+    width:720px;
+    max-width:100%
+  }
+}
+@media (min-width: 900px){
+  .container{
+    width:900px;
+    max-width:100%
+  }
+}
+@media (min-width: 1200px){
+  .container{
+    width:1200px;
+    max-width:100%
+  }
+}
+@media (min-width: 1450px){
+  .container{
+    width:1450px;
+    max-width:100%
+  }
+}
+@media (min-width: 1920px){
+  .container{
+    width:1600px;
+    max-width:100%
   }
 }

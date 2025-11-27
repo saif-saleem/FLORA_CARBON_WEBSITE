@@ -15,6 +15,8 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         serif: ['Merriweather', 'serif'],
+        outfit: ['Outfit', 'sans-serif'],
+        Orbitron: ["Orbitron", "sans-serif"], 
       },
       animation: {
         'aurora': 'aurora 60s linear infinite',

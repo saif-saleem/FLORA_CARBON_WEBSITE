@@ -1,58 +1,58 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus } from 'lucide-react';  // Icons for expand/collapse only
+import { Leaf, BarChart3, GraduationCap, Plus, Minus, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { redirectToGPT } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 import UpgradePrompt from '../components/UpgradePrompt';
 
-// Local images
-import AfforestationImg from '../assets/Afforestation1.png';
-import AgroforestoryImg from '../assets/Agroforestory1.png';
-import CarbonProjectImg from '../assets/CarbonProject1.png';
-import ClimateEducationImg from '../assets/ClimateEducation1.png';
-import MangroveImg from '../assets/Mangrove1.png';
+type Service = {
+  icon?: React.ComponentType<any>;
+  title: string;
+  content: string;
+  images?: string[]; // optional if you add images later
+};
 
-// Services data
-const services = [
+const services: Service[] = [
   {
-    title: "Carbon Project Development",
+    icon: Leaf,
+    title: 'Carbon Project Development',
     content:
-      "End-to-end guidance to design, validate, and structure high-quality carbon projects aligned with leading standards.",
-    images: [CarbonProjectImg],
+      'Get instant, expert answers on Forestry Carbon project requirements across VCS, Gold Standard, Plan Vivo, and ICR - powered by our Custom GPT trained on real project data and the standards requirements.',
   },
   {
-    title: "Afforestation and Reforestation",
+    icon: BarChart3,
+    title: 'Afforestation and Reforestation',
     content:
-      "Science-backed species selection and carbon yield estimation to support large-scale restoration initiatives.",
-    images: [AfforestationImg],
+      'Estimate species-specific biomass and carbon credits with validated allometric equations - use the tool to plan which species to plant for higher carbon yield and to calculate credits for trees you’ve already planted.',
   },
   {
-    title: "Mangrove Reforestation",
+    icon: Leaf,
+    title: 'Mangrove Reforestation',
     content:
-      "Comprehensive support for designing resilient, high-impact mangrove restoration and blue carbon projects.",
-    images: [MangroveImg],
+      'The process begins with initial assessment and feasibility studies, followed by careful project design and methodology selection. Financial modeling and ROI analysis help ensure the project’s economic viability, while implementation support and guidance facilitate smooth execution. Verification and certification assistance ensures compliance with standards, and long-term sustainability planning secures ongoing project success and impact.',
   },
   {
-    title: "Agroforestry",
+    icon: GraduationCap,
+    title: 'Agroforestry',
     content:
-      "Integrated agroforestry solutions that enhance productivity, biodiversity, and long-term carbon benefits.",
-    images: [AgroforestoryImg],
+      'We offer comprehensive workshops on nature-based climate solutions and training on carbon market fundamentals. Participants gain insights into sustainable land management practices, community engagement strategies, and the relevant policy and regulatory frameworks. Additionally, we provide custom corporate training programs tailored to meet the specific needs of organizations.',
   },
   {
-    title: "Climate Education and Training",
+    icon: GraduationCap,
+    title: 'Climate Education and Training',
     content:
-      "Expert-led training programs that build capacity in climate action, carbon markets, and sustainability practices.",
-    images: [ClimateEducationImg],
+      'We offer comprehensive workshops on nature-based climate solutions and training on carbon market fundamentals. Participants gain insights into sustainable land management practices, community engagement strategies, and the relevant policy and regulatory frameworks. Additionally, we provide custom corporate training programs tailored to meet the specific needs of organizations.',
   },
 ];
 
 const ServicesPage: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const { isAuthenticated, checkGptAccess, trialStatus } = useAuth();
 
   return (
-    <div className="bg-gradient-to-b from-emerald-950 to-black text-white min-h-screen">
-
-      {/* Header */}
+    <div className="bg-gradient-to-b from-emerald-950 to-black text-white">
       <div className="pt-40 pb-20 container-padding mx-auto max-w-4xl text-center">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -73,25 +73,25 @@ const ServicesPage: React.FC = () => {
         </motion.p>
       </div>
 
-      {/* Services */}
       <div className="container-padding mx-auto max-w-4xl pb-32">
-
         {services.map((service, index) => {
           const isOpen = openIndex === index;
+          const Icon = service.icon;
 
           return (
             <div key={index} className="border-b border-emerald-800">
-
-              {/* Accordion Button WITHOUT ICON */}
               <button
                 onClick={() => setOpenIndex(isOpen ? null : index)}
                 className="w-full flex justify-between items-center py-8 text-left"
                 aria-expanded={isOpen}
                 aria-controls={`service-panel-${index}`}
               >
-                <span className="text-2xl md:text-3xl font-semibold text-emerald-100">
-                  {service.title}
-                </span>
+                <div className="flex items-center">
+                  {Icon && <Icon className="h-8 w-8 text-emerald-300 mr-6" />}
+                  <span className="text-2xl md:text-3xl font-semibold text-emerald-100">
+                    {service.title}
+                  </span>
+                </div>
 
                 {isOpen ? (
                   <Minus className="h-6 w-6 text-emerald-200" />
@@ -100,46 +100,66 @@ const ServicesPage: React.FC = () => {
                 )}
               </button>
 
-              {/* Collapse Section */}
               <AnimatePresence initial={false}>
                 {isOpen && (
                   <motion.div
                     id={`service-panel-${index}`}
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
+                    animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className="pb-8 pl-4 md:pl-16">
+                    <div className="pb-8 pl-16">
+                      <p className="text-gray-300 text-lg leading-relaxed mb-8">{service.content}</p>
 
-                      {/* Content */}
-                      <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                        {service.content}
-                      </p>
+                      {/* Example: if you later add images per service, render them here */}
+                      {service.images && service.images.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {service.images.map((src, i) => (
+                            <div key={i} className="rounded-lg overflow-hidden shadow-lg">
+                              <img src={src} alt={`${service.title} ${i + 1}`} className="w-full h-40 md:h-56 object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
-                      {/* Image Gallery */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.45 }}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                      >
-                        {service.images?.map((src, i) => (
-                          <motion.div
-                            key={i}
-                            whileHover={{ scale: 1.03 }}
-                            className="rounded-lg overflow-hidden shadow-lg"
+                      {/* Optional GPT button block (only shown when title matches) */}
+                      {service.title === 'Flora Carbon GPT' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.6, delay: 0.5 }}
+                        >
+                          <button
+                            onClick={async () => {
+                              if (!isAuthenticated) {
+                                window.location.href = '/auth';
+                                return;
+                              }
+
+                              try {
+                                const accessCheck = await checkGptAccess();
+                                if (accessCheck?.hasAccess) {
+                                  const { VITE_CARBONGPT_URL } = import.meta.env;
+                                  await redirectToGPT(VITE_CARBONGPT_URL || 'https://gpt.floracarbon.ai/', checkGptAccess);
+                                } else {
+                                  setShowUpgradePrompt(true);
+                                }
+                              } catch (error: any) {
+                                if (error?.message) setShowUpgradePrompt(true);
+                                else alert('Unable to access GPT. Please try again.');
+                              }
+                            }}
+                            className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
                           >
-                            <img
-                              src={src}
-                              alt={`${service.title} ${i + 1}`}
-                              className="w-full h-72 md:h-96 object-cover"
-                              loading="lazy"
-                            />
-                          </motion.div>
-                        ))}
-                      </motion.div>
+                            <Bot className="h-5 w-5 group-hover:animate-pulse" />
+                            Start Chatting with Flora Carbon GPT
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                          </button>
+                        </motion.div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -147,15 +167,14 @@ const ServicesPage: React.FC = () => {
             </div>
           );
         })}
-
       </div>
 
       {/* Upgrade Prompt */}
       <UpgradePrompt
         isOpen={showUpgradePrompt}
         onClose={() => setShowUpgradePrompt(false)}
-        daysRemaining={0}
-        hasUsedTrial={false}
+        daysRemaining={trialStatus?.daysRemaining || 0}
+        hasUsedTrial={trialStatus?.hasUsedTrial || false}
       />
     </div>
   );

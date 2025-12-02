@@ -257,7 +257,7 @@ const HomePage: React.FC = () => {
               <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
                 <h3 className="text-xl md:text-2xl font-bold text-zinc-900 mb-3">Afforestation/Reforestation</h3>
                 <p className="text-sm text-zinc-600 mb-6">
-                  Your AI climate expert for instant, data-driven insights and project analysis.
+                  We develop all types of large-scale afforestation and reforestation projects, as well as urban afforestation and Miyawaki plantations.
                 </p>
               </div>
 
@@ -275,7 +275,7 @@ const HomePage: React.FC = () => {
               <div className="p-6">
                 <h3 className="text-lg font-bold text-zinc-900 mb-2">Agroforestory</h3>
                 <p className="text-sm text-zinc-600">
-                  Cutting-edge AI for precise Measurement, Reporting, and Verification.
+                  We develop agroforestry projects with smallholder farmers and help them improve their livelihoods and access long-term economic opportunities.
                 </p>
               </div>
 
@@ -295,7 +295,7 @@ const HomePage: React.FC = () => {
               <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
                 <h3 className="text-lg font-bold text-zinc-900 mb-3">Carbon Project</h3>
                 <p className="text-sm text-zinc-600">
-                  End-to-end consultation to develop high-integrity, impactful carbon projects.
+                  We develop high-quality, transparent forestry carbon projects with smallholder farmers, directly providing them incentives from carbon finance and supporting their livelihoods.
                 </p>
               </div>
 
@@ -314,16 +314,16 @@ const HomePage: React.FC = () => {
               
               {/* Text Section */}
               <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
-                <h3 className="text-lg font-bold text-zinc-900 mb-3">Climate Education & Training</h3>
+                <h3 className="text-lg font-bold text-zinc-900 mb-3">Mangrove Reforestation</h3>
                 <p className="text-sm text-zinc-600">
-                  Empowering organizations with the knowledge to lead in the green economy.
+                  We restore degraded mangrove habitats in the Sundarbans by planting a wide variety of native mangrove species to protect the coastline and support coastal communities.
                 </p>
               </div>
 
               {/* Image Section */}
               <div className="hidden md:block w-1/2 h-full">
                 <img
-                  src={ClimateEducation1Img}
+                  src={Mangrove1Img}
                   alt="Climate education"
                   className="object-cover w-full h-full"
                 />

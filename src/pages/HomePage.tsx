@@ -1,5 +1,7 @@
 // ✨ Updated HomePage Component — Images on right for bottom group
 
+
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -31,6 +33,31 @@ import AgroforestoryImg from '../assets/Agroforestory1.png';
 import CarbonProject1Img from '../assets/CarbonProject1.png';
 import ClimateEducation1Img from '../assets/ClimateEducation1.png';
 import Mangrove1Img from '../assets/Mangrove1.png';
+
+const CDN = import.meta.env.VITE_CDN_BASE_URL;
+
+const AFFORESTATION_IMG = `${CDN}/Afforestation1.webp`;  
+const AGROFORESTRY_IMG = `${CDN}/Agroforestory1.webp`;
+const CARBON_PROJECT_IMG = `${CDN}/CarbonProject1.webp`;
+const CLIMATE_EDUCATION_IMG = `${CDN}/ClimateEducation1.webp`;
+const MANGROVE_IMG = `${CDN}/Mangrove1.webp`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -263,9 +290,10 @@ const HomePage: React.FC = () => {
 
               <div className="hidden md:block md:w-1/2">
                 <img
-                  src={AfforestationImg}
+                  src={AFFORESTATION_IMG}
                   alt="Flora Carbon preview"
                   className="object-cover w-full h-full"
+                  loading="lazy"
                 />
               </div>
             </motion.div>
@@ -280,7 +308,10 @@ const HomePage: React.FC = () => {
               </div>
 
               <div className="w-full h-48">
-                <img src={AgroforestoryImg} alt="" className="object-cover w-full h-full" />
+                <img src={AGROFORESTRY_IMG} alt="" className="object-cover w-full h-full"
+                loading="lazy"
+                />
+                
               </div>
             </motion.div>
           </div>
@@ -302,9 +333,10 @@ const HomePage: React.FC = () => {
               {/* Image Section */}
               <div className="hidden md:block w-1/2 h-full">
                 <img
-                  src={CarbonProject1Img}
+                  src={CARBON_PROJECT_IMG}
                   alt="Carbon Project"
                   className="object-cover w-full h-full"
+                  loading="lazy"
                 />
               </div>
             </motion.div>
@@ -323,9 +355,10 @@ const HomePage: React.FC = () => {
               {/* Image Section */}
               <div className="hidden md:block w-1/2 h-full">
                 <img
-                  src={Mangrove1Img}
+                  src={MANGROVE_IMG}
                   alt="Climate education"
                   className="object-cover w-full h-full"
+                  loading="lazy"
                 />
               </div>
             </motion.div>

@@ -1,7 +1,5 @@
 // ✨ Updated HomePage Component — Images on right for bottom group
 
-
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -41,23 +39,6 @@ const AGROFORESTRY_IMG = `${CDN}/Agroforestory1.webp`;
 const CARBON_PROJECT_IMG = `${CDN}/CarbonProject1.webp`;
 const CLIMATE_EDUCATION_IMG = `${CDN}/ClimateEducation1.webp`;
 const MANGROVE_IMG = `${CDN}/Mangrove1.webp`;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -280,7 +261,7 @@ const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
 
             {/* Large left card */}
-            <motion.div className="md:col-span-2 bg-white rounded-2xl border h-[315px] flex overflow-hidden shadow-sm">
+            <motion.div className="md:col-span-2 bg-white rounded-2xl border h-auto md:h-[315px] flex flex-col md:flex-row overflow-hidden shadow-sm">
               <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
                 <h3 className="text-xl md:text-2xl font-bold text-zinc-900 mb-3">Afforestation/Reforestation</h3>
                 <p className="text-sm text-zinc-600 mb-6">
@@ -288,7 +269,7 @@ const HomePage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="hidden md:block md:w-1/2">
+              <div className="w-full h-48 md:w-1/2 md:h-full">
                 <img
                   src={AFFORESTATION_IMG}
                   alt="Flora Carbon preview"
@@ -299,7 +280,7 @@ const HomePage: React.FC = () => {
             </motion.div>
 
             {/* Small right card */}
-            <motion.div className="bg-white rounded-2xl border overflow-hidden shadow-sm flex flex-col h-[315px]">
+            <motion.div className="bg-white rounded-2xl border overflow-hidden shadow-sm flex flex-col h-auto md:h-[315px]">
               <div className="p-6">
                 <h3 className="text-lg font-bold text-zinc-900 mb-2">Agroforestory</h3>
                 <p className="text-sm text-zinc-600">
@@ -307,21 +288,21 @@ const HomePage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="w-full h-48">
+              <div className="w-full h-48 flex-grow">
                 <img src={AGROFORESTRY_IMG} alt="" className="object-cover w-full h-full"
-                loading="lazy"
+                  loading="lazy"
                 />
-                
+
               </div>
             </motion.div>
           </div>
 
           {/* Bottom group */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[330px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-auto md:h-[330px]">
 
             {/* Carbon Project */}
             <motion.div className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col md:flex-row">
-              
+
               {/* Text Section */}
               <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
                 <h3 className="text-lg font-bold text-zinc-900 mb-3">Carbon Project</h3>
@@ -331,7 +312,7 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Image Section */}
-              <div className="hidden md:block w-1/2 h-full">
+              <div className="w-full h-48 md:w-1/2 md:h-full">
                 <img
                   src={CARBON_PROJECT_IMG}
                   alt="Carbon Project"
@@ -343,7 +324,7 @@ const HomePage: React.FC = () => {
 
             {/* Climate Education */}
             <motion.div className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col md:flex-row">
-              
+
               {/* Text Section */}
               <div className="p-8 w-full md:w-1/2 flex flex-col justify-center">
                 <h3 className="text-lg font-bold text-zinc-900 mb-3">Mangrove Reforestation</h3>
@@ -353,7 +334,7 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Image Section */}
-              <div className="hidden md:block w-1/2 h-full">
+              <div className="w-full h-48 md:w-1/2 md:h-full">
                 <img
                   src={MANGROVE_IMG}
                   alt="Climate education"

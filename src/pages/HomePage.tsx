@@ -1,4 +1,4 @@
-// ✨ Updated HomePage Component — Images on right for bottom group
+// ✨ Updated HomePage Component — Fixed Mobile Visibility & Spacing
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -34,7 +34,7 @@ import Mangrove1Img from '../assets/Mangrove1.png';
 
 const CDN = import.meta.env.VITE_CDN_BASE_URL;
 
-const AFFORESTATION_IMG = `${CDN}/Afforestation1.webp`;  
+const AFFORESTATION_IMG = `${CDN}/Afforestation1.webp`;
 const AGROFORESTRY_IMG = `${CDN}/Agroforestory1.webp`;
 const CARBON_PROJECT_IMG = `${CDN}/CarbonProject1.webp`;
 const CLIMATE_EDUCATION_IMG = `${CDN}/ClimateEducation1.webp`;
@@ -66,24 +66,38 @@ const HomePage: React.FC = () => {
       {/* ---------------- HERO SECTION ---------------- */}
       <section className="relative flex flex-col justify-center items-center text-center overflow-hidden">
         {isMobile ? (
-          <div className="relative z-10 flex flex-col h-full w-full px-6 pt-16">
+          /* ⭐ CHANGED pt-16 to pt-32 to clear the Navbar ⭐ */
+          <div className="relative z-10 flex flex-col h-full w-full px-6 pt-32">
 
-            {/* Text */}
+            {/* ⭐ FIXED MOBILE TEXT SECTION ⭐ */}
             <div className="flex-1 flex flex-col justify-start items-center text-center mb-8">
+              
+              {/* Line 1: Bold */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="text-2xl sm:text-3xl font-bold mb-6 text-black drop-shadow-lg"
+                className="text-xl sm:text-2xl font-normal  text-black drop-shadow-lg"
               >
-                We Plant Trees. <br />Monitor tree growth. <br />Calculate and verify<br /> carbon credits.
+                We plant and track trees.
               </motion.h1>
+
+              {/* Lines 2 & 3: Normal weight + 1.7 Spacing */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.4 }}
+                className="text-xl sm:text-2xl font-normal  mb-6 text-black drop-shadow-lg"
+              >
+                We develop nature-based carbon projects.<br />
+                We build AI-powered dMRV tool.
+              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.8 }}
-                className="mt-8"
+                className="mt-4"
               >
                 <Link to="/services" className="btn-primary text-sm sm:text-base mr-4">Our Technology</Link>
                 <Link to="/pricing" className="btn-secondary text-sm sm:text-base">View Pricing</Link>
@@ -101,24 +115,25 @@ const HomePage: React.FC = () => {
         ) : (
           <div className="container relative z-10 flex flex-row items-start gap-8 w-full lg:pt-[10rem] xl:pt-[7rem] 2xl:pt-[10rem]">
 
-            {/* Text Column */}
+            {/* ⭐ DESKTOP TEXT SECTION ⭐ */}
             <div className="basis-[80%] shrink-0 text-left mb-8 px-4 lg:px-0 z-10">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="lg:text-3xl xl:text-4xl 2xl:text-6xl font-bold text-black drop-shadow-lg"
+                className="lg:text-2xl xl:text-3xl 2xl:text-5xl font-light leading-[1.7] text-black drop-shadow-lg"
               >
-                We Plant Trees.
+                We plant and track trees.
               </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="lg:text-2xl xl:text-3xl 2xl:text-5xl font-light text-black drop-shadow-lg"
+                className="lg:text-2xl xl:text-3xl 2xl:text-5xl font-light leading-[1.7] text-black drop-shadow-lg"
               >
-                <br />Monitor tree growth. Calculate and <br />verify carbon credits.
+                We develop nature-based carbon projects.<br />
+                We build AI-powered dMRV tool.
               </motion.div>
 
               <motion.div

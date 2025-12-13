@@ -77,9 +77,8 @@ const HomePage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="text-xl sm:text-2xl font-normal  text-black drop-shadow-lg"
+                className="text-xl sm:text-2xl font-normal  text-black drop-shadow-lg"                
               >
-                We plant and track trees.
               </motion.h1>
 
               {/* Lines 2 & 3: Normal weight + 1.7 Spacing */}
@@ -89,6 +88,7 @@ const HomePage: React.FC = () => {
                 transition={{ duration: 1, delay: 0.4 }}
                 className="text-xl sm:text-2xl font-normal  mb-6 text-black drop-shadow-lg"
               >
+                We plant and track trees.<br />
                 We develop nature-based carbon projects.<br />
                 We build AI-powered dMRV tool.
               </motion.div>

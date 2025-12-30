@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, CheckCircle, AlertCircle } from 'lucide-react';
-// The ContactForm component is not used here as the form is built directly for styling purposes.
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -31,7 +30,6 @@ const ContactPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -48,7 +46,6 @@ const ContactPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
     const newErrors: {[key: string]: string} = {};
     Object.entries(formData).forEach(([key, value]) => {
       const error = validateField(key, value);
@@ -62,16 +59,30 @@ const ContactPage: React.FC = () => {
 
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/contact/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        alert("Failed to send message. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("An error occurred. Please check your connection.");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-    }, 1500);
+    }
   };
 
   return (
-    // The background gradient is applied here
     <div className="bg-gradient-to-b from-emerald-950 to-black text-white">
       <div className="pt-40 pb-20 container-padding mx-auto max-w-4xl text-center">
         <motion.h1 
@@ -216,7 +227,6 @@ const ContactPage: React.FC = () => {
   );
 };
 
-// Helper component for contact items
 const ContactItem = ({ icon: Icon, title, detail, href }: any) => (
   <div className="flex items-start">
     <div className="bg-emerald-900/50 p-4 rounded-full mr-6 border border-emerald-700">

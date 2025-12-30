@@ -7,10 +7,13 @@ import TeamPage from './pages/TeamPage';
 import ContactPage from './pages/ContactPage';
 import AuthPage from './pages/AuthPage';
 import PricingPage from './pages/PricingPage';
-import BlogsPage from './pages/BlogsPage';
+// import BlogsPage from './pages/BlogsPage'; // Commented out as per your original file
 import AnimatedCursor from './components/AnimatedCursor';
 import { AuthProvider } from './contexts/AuthContext';
 
+/**
+ * Helper component to ensure the page scrolls to the top on every route change.
+ */
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -19,8 +22,38 @@ const ScrollToTop = () => {
   return null;
 };
 
-// Main App component with updated routing
+/**
+ * Connection Tester:
+ * This function attempts to ping your backend's signin route.
+ * Check your backend terminal for a "POST /api/auth/signin 400" log.
+ */
+const testBackendConnection = async () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  try {
+    console.log("🚀 Testing connection to:", backendUrl);
+    
+    const response = await fetch(`${backendUrl}/api/auth/signin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        email: 'test@connection.com', 
+        password: 'password123' 
+      })
+    });
+
+    const data = await response.json();
+    console.log("✅ Backend reached! Response:", data);
+  } catch (error) {
+    console.error("❌ Connection failed! Ensure your backend is running on port 5000 and .env is correct.", error);
+  }
+};
+
 function App() {
+  // Trigger the backend test when the application mounts
+  useEffect(() => {
+    testBackendConnection();
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
@@ -33,8 +66,7 @@ function App() {
             <Route path="/team" element={<TeamPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/pricing" element={<PricingPage />} />
-             {/* <Route path="/blogs" element={<BlogsPage />} />  */}
-            {/* The /auth route is now inside the main Layout */}
+            {/* <Route path="/blogs" element={<BlogsPage />} /> */}
             <Route path="/auth" element={<AuthPage />} />
           </Routes>
         </Layout>

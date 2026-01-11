@@ -7,6 +7,7 @@ import TeamPage from './pages/TeamPage';
 import ContactPage from './pages/ContactPage';
 import AuthPage from './pages/AuthPage';
 import PricingPage from './pages/PricingPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 // import BlogsPage from './pages/BlogsPage'; // Commented out as per your original file
 import AnimatedCursor from './components/AnimatedCursor';
 import { AuthProvider } from './contexts/AuthContext';
@@ -68,6 +69,7 @@ function App() {
             <Route path="/pricing" element={<PricingPage />} />
             {/* <Route path="/blogs" element={<BlogsPage />} /> */}
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           </Routes>
         </Layout>
       </Router>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Mail } from 'lucide-react';
+import { User, Lock, Mail, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
 // Correct way to read Vite env vars
 const { VITE_BACKEND_URL, VITE_CARBONGPT_URL } = import.meta.env;
-//hii this is test comment
+
 interface SignInResponse {
   token: string;
   name: string;
@@ -19,6 +19,8 @@ interface GetUserResponse {
 
 const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const { login } = useAuth();
 
@@ -27,6 +29,18 @@ const AuthPage: React.FC = () => {
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${BACKEND_URL}/api/auth/forgot-password`, { email: recoveryEmail });
+      alert("Check your email for the reset link!");
+      setIsForgotPassword(false);
+      setRecoveryEmail('');
+    } catch (err: any) {
+      alert(err.response?.data?.msg || "Error sending email.");
+    }
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,9 +61,8 @@ const AuthPage: React.FC = () => {
         const res = await axios.post<SignInResponse>(`${BACKEND_URL}/api/auth/signin`, { email, password });
         const token = res.data.token;
 
-        // Fetch user details using the token
         let userName = res.data.name;
-        let userEmail = email; // Use email from form as fallback
+        let userEmail = email; 
         
         try {
           const userRes = await axios.get<GetUserResponse>(`${BACKEND_URL}/api/auth/get`, {
@@ -61,7 +74,6 @@ const AuthPage: React.FC = () => {
           userName = userRes.data.name;
           userEmail = userRes.data.email;
 
-          // Debug: Print username and email in browser console
           console.log('✅ User details fetched successfully!');
           console.log('👤 Username:', userName);
           console.log('📧 Email:', userEmail);
@@ -72,14 +84,9 @@ const AuthPage: React.FC = () => {
           console.log('👤 Username:', userName);
         }
 
-        // Use AuthContext to update global auth state
         login(token, userName, userEmail);
 
-        // Wait a bit for trial status to refresh
         await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Redirect to home page after successful login
-        // User can then click "Start Chatting" button to access GPT app
         window.location.href = '/';
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
@@ -91,7 +98,10 @@ const AuthPage: React.FC = () => {
     }
   };
 
-  const toggleAuthMode = () => setIsSignUp(!isSignUp);
+  const toggleAuthMode = () => {
+    setIsSignUp(!isSignUp);
+    setIsForgotPassword(false);
+  };
 
   const formVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -109,68 +119,116 @@ const AuthPage: React.FC = () => {
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           <h2 className="text-4xl font-bold text-center text-emerald-200 mb-2">
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
+            {isForgotPassword ? 'Reset Password' : (isSignUp ? 'Create Account' : 'Welcome Back')}
           </h2>
           <p className="text-center text-gray-300 mb-8">
-            {isSignUp ? 'Join to access our AI tools.' : 'Sign in to continue.'}
+            {isForgotPassword ? 'Enter your email to receive a reset link.' : (isSignUp ? 'Join to access our AI tools.' : 'Sign in to continue.')}
           </p>
 
           <AnimatePresence mode="wait">
-            <motion.div
-              key={isSignUp ? 'signup' : 'signin'}
-              variants={formVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <form onSubmit={onSubmit} className="space-y-6">
-                {isSignUp && (
+            {isForgotPassword ? (
+              <motion.div
+                key="forgot"
+                variants={formVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <form onSubmit={handleForgotSubmit} className="space-y-6">
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
                     <input
-                      type="text"
-                      placeholder="Full Name"
-                      name="name"
-                      value={name}
+                      type="email"
+                      placeholder="Email Address"
+                      value={recoveryEmail}
+                      onChange={(e) => setRecoveryEmail(e.target.value)}
+                      required
+                      className="w-full bg-emerald-900/30 p-3 pl-10 rounded-lg border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-400"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full btn-primary !bg-emerald-600 hover:!bg-emerald-500 !py-3"
+                  >
+                    Send Reset Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPassword(false)}
+                    className="flex items-center justify-center w-full text-sm text-gray-400 hover:text-white mt-4"
+                  >
+                    <ArrowLeft size={16} className="mr-2" /> Back to Sign In
+                  </button>
+                </form>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={isSignUp ? 'signup' : 'signin'}
+                variants={formVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <form onSubmit={onSubmit} className="space-y-6">
+                  {isSignUp && (
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Full Name"
+                        name="name"
+                        value={name}
+                        onChange={onChange}
+                        required
+                        className="w-full bg-emerald-900/30 p-3 pl-10 rounded-lg border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-400"
+                      />
+                    </div>
+                  )}
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      name="email"
+                      value={email}
                       onChange={onChange}
                       required
                       className="w-full bg-emerald-900/30 p-3 pl-10 rounded-lg border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-400"
                     />
                   </div>
-                )}
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    name="email"
-                    value={email}
-                    onChange={onChange}
-                    required
-                    className="w-full bg-emerald-900/30 p-3 pl-10 rounded-lg border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-400"
-                  />
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    value={password}
-                    onChange={onChange}
-                    required
-                    minLength={6}
-                    className="w-full bg-emerald-900/30 p-3 pl-10 rounded-lg border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-400"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full btn-primary !bg-emerald-600 hover:!bg-emerald-500 !py-3"
-                >
-                  {isSignUp ? 'Sign Up' : 'Sign In'}
-                </button>
-              </form>
-            </motion.div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" size={20} />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      name="password"
+                      value={password}
+                      onChange={onChange}
+                      required
+                      minLength={6}
+                      className="w-full bg-emerald-900/30 p-3 pl-10 rounded-lg border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-400"
+                    />
+                  </div>
+                  
+                  {!isSignUp && (
+                    <button 
+                      type="button"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-sm text-emerald-400 hover:text-emerald-300 float-right mb-2 transition-colors"
+                    >
+                      Forgot Password?
+                    </button>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full btn-primary !bg-emerald-600 hover:!bg-emerald-500 !py-3 mt-4"
+                  >
+                    {isSignUp ? 'Sign Up' : 'Sign In'}
+                  </button>
+                </form>
+              </motion.div>
+            )}
           </AnimatePresence>
 
           <div className="mt-8 text-center">

@@ -6,6 +6,7 @@ import manirImage from '../assets/manir.jpeg';
 import saifImage from '../assets/saif.jpg';
 import harishImage from '../assets/harish.jpeg';
 import rajendarImage from '../assets/Dr. Rajendra.jpeg';
+import aaronImage from '../assets/Aaron_Arathoon.jpeg';
 
 const teamMembers = [
   {
@@ -43,6 +44,15 @@ const teamMembers = [
     profileUrl: "https://www.linkedin.com/in/harish-pandey/",
     description:
       "Harish has completed a Post Graduate Diploma from IIRS in Forest Resources & Ecosystem Analysis and has over 5 years’ experience working in forestry and carbon projects.",
+  },
+  {
+    name: "Aaron Arathoon",
+    role: "Partnership Manager",
+    imageUrl: aaronImage,
+    location: "India",
+    profileUrl: "https://www.linkedin.com/in/aaron-jude-arathoon-64b43b175/",
+    description:
+      "Aaron hold a Bachelor’s degree and  brings over 5+ years of experience in CSR partnerships and urban afforestation projects.",
   },
 ];
 

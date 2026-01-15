@@ -313,7 +313,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Bottom group */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-auto md:h-[330px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-auto md:h-[234px]">
 
             {/* Carbon Project */}
             <motion.div className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col md:flex-row">
@@ -331,7 +331,7 @@ const HomePage: React.FC = () => {
                 <img
                   src={CARBON_PROJECT_IMG}
                   alt="Carbon Project"
-                  className="object-cover w-full h-full"
+                  className="object-contain w-full h-full"
                   loading="lazy"
                 />
               </div>

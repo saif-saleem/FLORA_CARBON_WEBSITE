@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import ServicesPage from './pages/ServicesPage';
@@ -55,25 +56,30 @@ function App() {
     testBackendConnection();
   }, []);
 
+  // Replace this with your actual Client ID if it's not in your env file yet
+  const GOOGLE_CLIENT_ID = "1039084738288-fb2ca14420kn2ua2pg62i9esglkpjrff.apps.googleusercontent.com";
+
   return (
-    <AuthProvider>
-      <Router>
-        <AnimatedCursor />
-        <ScrollToTop />
-        <Layout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            {/* <Route path="/blogs" element={<BlogsPage />} /> */}
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          </Routes>
-        </Layout>
-      </Router>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <Router>
+          <AnimatedCursor />
+          <ScrollToTop />
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/team" element={<TeamPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              {/* <Route path="/blogs" element={<BlogsPage />} /> */}
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

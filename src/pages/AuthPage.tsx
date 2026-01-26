@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, Lock, Mail, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 // Correct way to read Vite env vars
 const { VITE_BACKEND_URL, VITE_CARBONGPT_URL } = import.meta.env;
@@ -227,6 +228,30 @@ const AuthPage: React.FC = () => {
                     {isSignUp ? 'Sign Up' : 'Sign In'}
                   </button>
                 </form>
+
+                {/* Google Login Integration */}
+                <div className="mt-6 flex flex-col items-center">
+                  <div className="w-full border-t border-emerald-800 mb-6 flex items-center">
+                    <span className="bg-black/20 px-2 text-gray-500 text-sm mx-auto">OR</span>
+                  </div>
+
+                  <GoogleLogin
+                    onSuccess={async (credentialResponse) => {
+                      try {
+                        const res = await axios.post(`${BACKEND_URL}/api/auth/google-login`, {
+                          token: credentialResponse.credential,
+                        });
+                        login(res.data.token, res.data.name, res.data.email);
+                        window.location.href = '/'; 
+                      } catch (err) {
+                        alert("Google Login Failed. Please try again.");
+                      }
+                    }}
+                    onError={() => console.log('Login Failed')}
+                    theme="filled_black"
+                    shape="pill"
+                  />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

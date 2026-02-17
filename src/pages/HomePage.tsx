@@ -205,7 +205,7 @@ const HomePage: React.FC = () => {
               <img src={group205Img} className="absolute top-0 bottom-0 right-0 h-full object-cover" />
 
               <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold text-emerald-200 mb-3">Flora Carbon GPT</h3>
+                <h3 className="text-2xl md:text-3xl font-bold text-emerald-200 mb-3">Flora GPT</h3>
                 <p className="text-sm md:text-base text-gray-300 max-w-lg mb-6 leading-relaxed">
                   The world’s smartest assistant for answering any question on Carbon Standards and Project requirements.
                 </p>

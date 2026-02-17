@@ -52,7 +52,7 @@ const AuthPage: React.FC = () => {
         setIsSignUp(false);
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
-          alert(err.response?.data?.message || 'Error: User may already exist or server is down.');
+          alert(err.response?.data?.msg || err.response?.data?.message || 'Server error');
         } else {
           alert('Error: User may already exist or server is down.');
         }
@@ -91,7 +91,7 @@ const AuthPage: React.FC = () => {
         window.location.href = '/';
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
-          alert(err.response?.data?.message || 'Error: Invalid credentials.');
+          alert(err.response?.data?.msg || err.response?.data?.message || 'Invalid credentials');
         } else {
           alert('Error: Invalid credentials.');
         }

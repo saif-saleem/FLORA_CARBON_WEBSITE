@@ -254,7 +254,7 @@ const HomePage: React.FC = () => {
                     className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-700 text-white px-5 py-2 rounded-full"
                   >
                     <Bot className="h-4 w-4" />
-                    Launch Soon
+                    Launching Soon
                   </a>
 
                   <p className="text-xs text-gray-400 mt-3">Free to use • No registration required</p>

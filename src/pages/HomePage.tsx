@@ -249,12 +249,13 @@ const HomePage: React.FC = () => {
 
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}>
                   <a
+                    href="https://calendly.com/manir-floracarbon/30min"
                     // href="https://carbon-calculatorv2.0.floracarbon.ai/"
                     target="_blank"
                     className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary-500 to-primary-700 text-white px-5 py-2 rounded-full"
                   >
                     <Bot className="h-4 w-4" />
-                    Launching Soon
+                    Book a Demo
                   </a>
 
                   <p className="text-xs text-gray-400 mt-3">Free to use • No registration required</p>
